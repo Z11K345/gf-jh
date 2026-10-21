@@ -48,14 +48,13 @@ td.ph{font-variant-numeric:tabular-nums;font-weight:600}
       <button id="t1" class="on">新号码 <span id="c1"></span></button>
       <button id="t2">重复号码 <span id="c2"></span></button>
     </div>
-    <div class="n" id="note"></div>
     <div id="tb1"></div>
     <div id="tb2" class="hide"></div>
   </div>
 </div>
 
 <script>
-var PACK = {"v": 1, "iter": 200000, "salt": "NlynA/m2vyX/8AzrVOOFzg==", "iv": "PAziTN2WkB8eIRlX", "ct": "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"};
+var PACK = {"v": 1, "iter": 200000, "salt": "Kj4gO7vQVdAnxsdhddGvAg==", "iv": "i2dRBMwGNVcbDw9j", "ct": "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"};
 function b64(s){var b=atob(s),u=new Uint8Array(b.length);for(var i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u;}
 function go(){
   var pwd=document.getElementById('pwd').value;
@@ -73,14 +72,11 @@ document.getElementById('go').onclick=go;
 document.getElementById('pwd').addEventListener('keydown',function(e){if(e.key==='Enter')go();});
 
 function esc(s){return String(s==null?'':s).replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];});}
-function tbl(rows,inTotal){
+function tbl(rows){
   var h='<table><thead><tr><th>手机号码</th><th>时间</th><th>用户页面</th><th>员工</th></tr></thead><tbody>';
   rows.forEach(function(r){
-    var p=String(r[0]||'').replace(/\D/g,'');
-    var mark=(inTotal.indexOf(p)>=0)?'<span class="tag">已在总表</span>':'';
-    var last = r.length>4 ? esc(r[3])+' '+esc(r[4]) : esc(r[3]);
-    h+='<tr><td class="ph">'+esc(r[0])+mark+'</td><td>'+esc(r[1])+'</td><td>'+esc(r[2])+
-       '</td><td>'+last+'</td></tr>';
+    h+='<tr><td class="ph">'+esc(r[0])+'</td><td>'+esc(r[1])+'</td><td>'+esc(r[2])+
+       '</td><td>'+(r.length>4 ? esc(r[3])+' '+esc(r[4]) : esc(r[3]))+'</td></tr>';
   });
   return h+'</tbody></table>';
 }
@@ -90,10 +86,9 @@ function render(d){
   document.getElementById('meta').textContent='更新于 '+d.updated+' ｜ 共 '+(d.ws1.length+d.ws2.length)+' 条';
   document.getElementById('c1').textContent='('+d.ws1.length+')';
   document.getElementById('c2').textContent='('+d.ws2.length+')';
-  document.getElementById('note').textContent='新号码中已在金山总号码表：'+d.in_total.length+' 个';
-  document.getElementById('tb1').innerHTML=tbl(d.ws1,d.in_total);
+  document.getElementById('tb1').innerHTML=tbl(d.ws1);
   // 重复号码表不标「已在总表」：能进重复表本身就是总表命中筛出来的，再标是废话（曾科 10/22）
-  document.getElementById('tb2').innerHTML=tbl(d.ws2,[]);
+  document.getElementById('tb2').innerHTML=tbl(d.ws2);
   document.getElementById('t1').onclick=function(){show(1);};
   document.getElementById('t2').onclick=function(){show(2);};
 }
