@@ -1,26 +1,106 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
+<!doctype html>
+<html lang="zh-CN"><head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
 <title>号码清单</title>
 <style>
-body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
-background:#f5f6f8;color:#222;display:flex;align-items:center;justify-content:center;min-height:100vh}
-.box{background:#fff;border-radius:12px;padding:28px 22px;max-width:420px;width:88%;
-box-shadow:0 2px 12px rgba(0,0,0,.08);text-align:center}
-h1{font-size:17px;margin:0 0 10px;font-weight:600}
-p{font-size:14px;line-height:1.8;color:#666;margin:6px 0}
-.tag{display:inline-block;margin-top:14px;font-size:12px;color:#999}
-</style>
-</head>
-<body>
-<div class="box">
+*{box-sizing:border-box}
+body{margin:0;font:15px/1.6 -apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+background:#f5f6f8;color:#1a1a1a;padding:16px}
+.wrap{max-width:720px;margin:0 auto}
+.card{background:#fff;border-radius:12px;padding:16px;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,.07)}
+h1{font-size:18px;margin:0 0 4px}
+.sub{font-size:13px;color:#888;margin-bottom:14px}
+label{font-size:13px;color:#666;display:block;margin-bottom:6px}
+input{width:100%;padding:12px;font-size:16px;border:1px solid #ddd;border-radius:8px;outline:none}
+input:focus{border-color:#d97706}
+button{width:100%;margin-top:12px;padding:13px;font-size:16px;font-weight:600;color:#fff;
+background:#d97706;border:0;border-radius:8px}
+button:active{opacity:.85}
+.err{color:#c0392b;font-size:13px;margin-top:10px;min-height:20px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{padding:9px 6px;text-align:left;border-bottom:1px solid #eee;vertical-align:top}
+th{color:#888;font-weight:500;font-size:12px}
+td.ph{font-variant-numeric:tabular-nums;font-weight:600}
+.tag{display:inline-block;font-size:11px;padding:1px 6px;border-radius:4px;background:#fef3c7;color:#92400e;margin-left:4px}
+.tabs{display:flex;gap:8px;margin-bottom:12px}
+.tabs button{flex:1;margin:0;background:#fff;color:#555;border:1px solid #e5e7eb;font-weight:500}
+.tabs button.on{background:#d97706;color:#fff;border-color:#d97706}
+.n{font-size:12px;color:#888;margin-bottom:8px}
+.hide{display:none}
+</style></head><body><div class="wrap">
+
+<div class="card" id="lockCard">
   <h1>号码清单</h1>
-  <p>页面通道已就绪。</p>
-  <p>数据尚未注入，请稍后再访问。</p>
-  <div class="tag">需要口令才能查看</div>
+  <div class="sub">数据已加密，请输入口令查看</div>
+  <label>口令</label>
+  <input id="pwd" type="password" inputmode="text" autocomplete="current-password" placeholder="请输入口令">
+  <button id="go">解 锁</button>
+  <div class="err" id="err"></div>
 </div>
-</body>
-</html>
+
+<div id="main" class="hide">
+  <div class="card">
+    <h1>号码清单</h1>
+    <div class="sub" id="meta"></div>
+    <div class="tabs">
+      <button id="t1" class="on">新号码 <span id="c1"></span></button>
+      <button id="t2">重复号码 <span id="c2"></span></button>
+    </div>
+    <div class="n" id="note"></div>
+    <div id="tb1"></div>
+    <div id="tb2" class="hide"></div>
+  </div>
+</div>
+
+<script>
+var PACK = {"v": 1, "iter": 200000, "salt": "/vUBYWXvDhnqX7GJp2zIlA==", "iv": "GcS0NjoClVZisoVZ", "ct": "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"};
+function b64(s){var b=atob(s),u=new Uint8Array(b.length);for(var i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u;}
+function go(){
+  var pwd=document.getElementById('pwd').value;
+  var err=document.getElementById('err'); err.textContent='解密中…';
+  crypto.subtle.importKey('raw',new TextEncoder().encode(pwd),'PBKDF2',false,['deriveBits'])
+  .then(function(k){return crypto.subtle.deriveBits(
+      {name:'PBKDF2',salt:b64(PACK.salt),iterations:PACK.iter,hash:'SHA-256'},k,256);})
+  .then(function(bits){return crypto.subtle.importKey('raw',bits,'AES-GCM',false,['decrypt']);})
+  .then(function(key){return crypto.subtle.decrypt(
+      {name:'AES-GCM',iv:b64(PACK.iv)},key,b64(PACK.ct));})
+  .then(function(pt){render(JSON.parse(new TextDecoder().decode(pt)));})
+  .catch(function(e){err.textContent='口令不对，或数据已损坏';});
+}
+document.getElementById('go').onclick=go;
+document.getElementById('pwd').addEventListener('keydown',function(e){if(e.key==='Enter')go();});
+
+function esc(s){return String(s==null?'':s).replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];});}
+function tbl(rows,inTotal){
+  var h='<table><thead><tr><th>手机号码</th><th>时间</th><th>用户页面</th><th>备注</th></tr></thead><tbody>';
+  rows.forEach(function(r){
+    var p=String(r[0]||'').replace(/\D/g,'');
+    var mark=(inTotal.indexOf(p)>=0)?'<span class="tag">已在总表</span>':'';
+    var last = r.length>4 ? esc(r[3])+' '+esc(r[4]) : esc(r[3]);
+    h+='<tr><td class="ph">'+esc(r[0])+mark+'</td><td>'+esc(r[1])+'</td><td>'+esc(r[2])+
+       '</td><td>'+last+'</td></tr>';
+  });
+  return h+'</tbody></table>';
+}
+function render(d){
+  document.getElementById('lockCard').classList.add('hide');
+  document.getElementById('main').classList.remove('hide');
+  document.getElementById('meta').textContent='更新于 '+d.updated+' ｜ 共 '+(d.ws1.length+d.ws2.length)+' 条';
+  document.getElementById('c1').textContent='('+d.ws1.length+')';
+  document.getElementById('c2').textContent='('+d.ws2.length+')';
+  document.getElementById('note').textContent='其中已在金山总号码表：'+d.in_total.length+' 个';
+  document.getElementById('tb1').innerHTML=tbl(d.ws1,d.in_total);
+  document.getElementById('tb2').innerHTML=tbl(d.ws2,d.in_total);
+  document.getElementById('t1').onclick=function(){show(1);};
+  document.getElementById('t2').onclick=function(){show(2);};
+}
+function show(i){
+  document.getElementById('tb1').classList.toggle('hide',i!==1);
+  document.getElementById('tb2').classList.toggle('hide',i!==2);
+  document.getElementById('t1').classList.toggle('on',i===1);
+  document.getElementById('t2').classList.toggle('on',i===2);
+}
+</script>
+</div></body></html>
