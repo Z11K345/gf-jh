@@ -3,100 +3,1199 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#ffffff">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23c8102e'/%3E%3Ctext x='32' y='45' font-size='34' font-family='Microsoft YaHei,PingFang SC,sans-serif' font-weight='bold' fill='%23fff' text-anchor='middle'%3E号%3C/text%3E%3C/svg%3E">
 <title>号码清单</title>
+<script>
+/* 手机/平板浏览器识别：先给 html 打标，避免样式错闪
+   ① UA 明确是移动端（含 iPadOS 伪装成 Mac 的情况）→ 打标
+   ② UA 认不出但「无悬浮能力的触屏」且指针为粗指针、宽度不超平板 → 打标
+   ③ 桌面浏览器拖窄窗口 → 走 @media(max-width:720px) 的响应式，不算手机 */
+(function(){
+  var h=document.documentElement;
+  var ua=navigator.userAgent||'';
+  var mq=function(q){try{return !!(window.matchMedia&&matchMedia(q).matches);}catch(e){return false;}};
+  var uaMobile=/Android|iPhone|iPod|iPad|iMobile|HarmonyOS|OpenHarmony|Mobile|Windows Phone|BlackBerry|Opera Mini|MicroMessenger|Weibo|DingTalk|wxwork/i.test(ua)||
+    (/Macintosh/.test(ua)&&(navigator.maxTouchPoints||0)>1); /* iPadOS 13+ 伪装成 Mac */
+  var touch=((navigator.maxTouchPoints||0)>0)||('ontouchstart' in window)||mq('(any-pointer:coarse)');
+  var coarse=mq('(pointer:coarse)')||mq('(any-pointer:coarse)');
+  var noHover=mq('(hover:none)')||mq('(any-hover:none)');
+  var fit=(screen.width||window.innerWidth)<=1100;
+  h.classList.toggle('is-mobile', !!uaMobile || (touch&&coarse&&noHover&&fit));
+})();
+</script>
 <style>
+/* ── 设计变量（对齐广发证券官网 gf.com.cn，曾科 10/22）──
+   官网实测（umi.css）：白底 #fff、描边 #e6eaf0、正文 #313133、
+   链接蓝 #2a6cdd、深蓝 #074696。红色在官网只出现在 logo 里，界面几乎不用 → 红降到最低。
+   字体：PingFangSC-Regular/Medium/Semibold + Microsoft YaHei（官网原字体栈）。 */
+:root{
+  --brand:#2a6cdd;--brand-d:#074696;--brand-l:#4f87e4;
+  --red:#e60012;                 /* 广发 logo 红，仅 logo / 极小面积强调 */
+  --ink:#313133;--ink2:#47474a;--sub:#67696e;--faint:#939599;
+  --bg:#f7f8fa;--bg2:#fafbfc;--card:#ffffff;
+  --line:#e6eaf0;--line2:#eff2f6;
+  --new-bg:#fdeceb;--new-fg:#b3261e;--old-bg:#e8f3ec;--old-fg:#1c6b3c;
+  --ring:rgba(42,108,221,.14);
+  --sh:0 1px 2px rgba(49,49,51,.05);
+  --sh2:0 2px 8px rgba(49,49,51,.08);
+  --r:4px;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --brand:#5f95e8;--brand-d:#8fb8f0;--brand-l:#7aa9ec;
+    --red:#f04a58;
+    --ink:#e8ecf2;--ink2:#c6ccd6;--sub:#949aa5;--faint:#6f757f;
+    --bg:#0e1116;--bg2:#12161c;--card:#181d24;
+    --line:#262c35;--line2:#1f242b;
+    --new-bg:#3a1f1e;--new-fg:#f0a09a;--old-bg:#17301f;--old-fg:#8fd3a8;
+    --ring:rgba(95,149,232,.22);
+    --sh:0 1px 2px rgba(0,0,0,.4),0 6px 20px -10px rgba(0,0,0,.6);
+    --sh2:0 2px 8px rgba(0,0,0,.5),0 18px 44px -18px rgba(0,0,0,.7);
+  }
+}
 *{box-sizing:border-box}
-body{margin:0;font:15px/1.6 -apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
-background:#f5f6f8;color:#1a1a1a;padding:16px}
-.wrap{max-width:720px;margin:0 auto}
-.card{background:#fff;border-radius:12px;padding:16px;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,.07)}
-h1{font-size:18px;margin:0 0 4px}
-.sub{font-size:13px;color:#888;margin-bottom:14px}
-label{font-size:13px;color:#666;display:block;margin-bottom:6px}
-input{width:100%;padding:12px;font-size:16px;border:1px solid #ddd;border-radius:8px;outline:none}
-input:focus{border-color:#d97706}
-button{width:100%;margin-top:12px;padding:13px;font-size:16px;font-weight:600;color:#fff;
-background:#d97706;border:0;border-radius:8px}
-button:active{opacity:.85}
-.err{color:#c0392b;font-size:13px;margin-top:10px;min-height:20px}
-table{width:100%;border-collapse:collapse;font-size:14px}
-th,td{padding:9px 6px;text-align:left;border-bottom:1px solid #eee;vertical-align:top}
-th{color:#888;font-weight:500;font-size:12px}
-td.ph{font-variant-numeric:tabular-nums;font-weight:600}
-.tag{display:inline-block;font-size:11px;padding:1px 6px;border-radius:4px;background:#fef3c7;color:#92400e;margin-left:4px}
-.tabs{display:flex;gap:8px;margin-bottom:12px}
-.tabs button{flex:1;margin:0;background:#fff;color:#555;border:1px solid #e5e7eb;font-weight:500}
-.tabs button.on{background:#d97706;color:#fff;border-color:#d97706}
-.n{font-size:12px;color:#888;margin-bottom:8px}
+html{-webkit-text-size-adjust:100%}
+html,body{margin:0}
+/* ── 排版刻度（对齐广发官网实测，曾科 10/22）──
+   只允许 5 档字号：12 / 14 / 16 / 20 / 24 —— 大厂通用刻度，取消一切 .5 碎档。
+   正文 16px / 行高 24px（官网原值），次要信息 14px / 20px，微标 12px / 18px。
+   字重只用 400（正文）与 700（强调），中间 500/600 一律不用 —— 层级才拉得开。
+   letter-spacing 全部归零（官网 0 处使用），中文字距交给字体本身。 */
+body{
+  font-family:"PingFang SC","Microsoft YaHei","PingFangSC-Regular","Hiragino Sans GB",-apple-system,"Segoe UI",sans-serif;
+  font-size:16px;line-height:24px;font-weight:400;
+  color:var(--ink);min-height:100vh;
+  background:var(--bg);
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  text-rendering:optimizeLegibility;
+}
+
+/* ── 顶栏（与官网一致：纯白底 + 1px 浅描边，无彩色条） ── */
+.top{
+  background:var(--card);color:var(--ink);padding:0 24px;
+  border-bottom:1px solid var(--line);
+}
+.topin{max-width:1100px;margin:0 auto;height:60px;display:flex;
+  align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.brandbox{display:flex;align-items:center;gap:10px;min-width:0}
+.logo{width:26px;height:26px;border-radius:4px;flex:0 0 auto;
+  background:var(--red);color:#fff;
+  display:grid;place-items:center;font-size:13px;font-weight:700;line-height:1}
+.brand{font-size:20px;font-weight:700;line-height:28px;white-space:nowrap;color:var(--ink)}
+.meta{color:var(--sub);font-size:14px;line-height:20px;display:flex;align-items:center;gap:10px;
+  font-variant-numeric:tabular-nums;flex-wrap:wrap}
+.meta .sep{opacity:.4}
+/* 数据刚更新时顶部时间条闪一下（背景变亮再回落），让人一眼看到「刚进来新号」 */
+.meta.flash{animation:metaflash 1.5s ease-out}
+@keyframes metaflash{
+  0%{background:rgba(42,108,221,.12);border-radius:4px;padding:4px 8px;margin:-4px -8px}
+  70%{background:rgba(42,108,221,.06);border-radius:4px;padding:4px 8px;margin:-4px -8px}
+  100%{background:transparent;padding:4px 8px;margin:-4px -8px}
+}
+.dotlive{width:7px;height:7px;border-radius:50%;background:#22b46a;
+  box-shadow:0 0 0 3px rgba(34,180,106,.14);display:inline-block;flex:0 0 auto}
+/* ── 登录态指示（曾科 10/22）──────────────────────────────
+   两处状态：期商平台(fas)、预开户系统(kx)。
+   ★ 16:29 曾科：红点绿点要保留，一眼就知道是否正常——绿点=正常，红点=需要重登
+     （闪烁+可点弹出登录窗口）。 */
+.st{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.st .d{width:7px;height:7px;border-radius:50%;flex:0 0 auto;background:#22b46a;
+  box-shadow:0 0 0 3px rgba(34,180,106,.14)}
+.st.bad .d{background:#e60012;box-shadow:0 0 0 3px rgba(230,0,18,.16);
+  animation:stblink 1.6s ease-in-out infinite}
+@keyframes stblink{0%,100%{opacity:1}50%{opacity:.35}}
+.st .txt{color:var(--faint)}
+.st.bad .txt{color:#e60012}
+.st.bad{cursor:pointer}
+.st.bad:hover .txt{text-decoration:underline}
+
+/* 重登弹窗 */
+.mask{position:fixed;inset:0;background:rgba(20,22,26,.44);z-index:90;
+  display:flex;align-items:center;justify-content:center;padding:20px}
+.mask.hide{display:none}
+.dlg{background:var(--card);border-radius:10px;max-width:400px;width:100%;
+  box-shadow:0 24px 60px -20px rgba(7,70,150,.35);padding:22px 22px 18px}
+.dlg h3{margin:0 0 4px;font-size:17px;line-height:26px;font-weight:700;color:var(--ink)}
+.dlg .desc{margin:0 0 16px;font-size:13px;line-height:20px;color:var(--sub)}
+.fld{margin-bottom:12px}
+.fld label{display:block;font-size:12px;line-height:18px;color:var(--faint);margin-bottom:5px}
+.fld .row{display:flex;align-items:center;gap:8px}
+.fld input{flex:1;min-width:0;font:inherit;font-size:15px;line-height:22px;padding:8px 11px;
+  border:1px solid var(--line);border-radius:6px;background:#fafbfc;color:var(--ink);
+  -webkit-user-select:text;user-select:text}
+.fld .cp{font-size:12px;line-height:18px;padding:7px 10px;border-radius:6px;cursor:pointer;
+  border:1px solid var(--line);background:var(--card);color:var(--brand-d);white-space:nowrap}
+.fld .cp:active{background:#eef3fc}
+.dlg .acts{display:flex;gap:10px;justify-content:flex-end;margin-top:16px}
+.dlg .acts button{font:inherit;font-size:14px;line-height:20px;padding:8px 16px;border-radius:6px;
+  cursor:pointer;border:1px solid var(--line);background:var(--card);color:var(--ink2)}
+.dlg .acts .pri{background:var(--brand);border-color:var(--brand);color:#fff;font-weight:700}
+.dlg .tip{margin-top:12px;font-size:12px;line-height:18px;color:var(--faint)}
+
+.pagehead{max-width:1100px;margin:0 auto;padding:18px 18px 0;display:flex;
+  align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.pagehead h1{margin:0;font-size:20px;line-height:28px;font-weight:700;color:var(--ink)}
+.pagehead .today{font-size:14px;line-height:20px;color:var(--sub);font-variant-numeric:tabular-nums}
+.wrap{max-width:1100px;margin:14px auto 48px;padding:0 18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);
+  box-shadow:var(--sh)}
+
+/* ── 解锁卡 ── */
+#lockCard{max-width:404px;margin:9vh auto 0;padding:32px 32px 28px;box-shadow:var(--sh2)}
+#lockCard .ico{width:44px;height:44px;border-radius:8px;display:grid;place-items:center;
+  background:rgba(42,108,221,.07);
+  border:1px solid rgba(42,108,221,.14);color:var(--brand);margin-bottom:16px}
+#lockCard h1{font-size:24px;line-height:32px;margin:0 0 8px;font-weight:700;color:var(--ink)}
+#lockCard .sub{font-size:14px;line-height:20px;color:var(--sub);margin:0 0 22px}
+label{font-size:14px;line-height:20px;color:var(--sub);display:block;margin-bottom:8px}
+input{width:100%;padding:11px 14px;font-size:16px;line-height:24px;color:var(--ink);
+  background:var(--bg2);border:1px solid var(--line);border-radius:4px;outline:none;
+  transition:border-color .18s,box-shadow .18s,background .18s}
+input::placeholder{color:var(--faint)}
+input:focus{border-color:var(--brand);background:var(--card);box-shadow:0 0 0 3px var(--ring)}
+#go{width:100%;margin-top:20px;padding:11px;font-size:15px;line-height:22px;font-weight:700;color:#fff;
+  background:var(--brand);
+  border:0;border-radius:4px;cursor:pointer;
+  box-shadow:none;transition:filter .15s}
+#go:hover{filter:brightness(1.08)}
+#go:active{filter:brightness(.96)}
+#go[disabled]{opacity:.68;cursor:progress}
+.err{color:#b3261e;font-size:14px;line-height:20px;margin-top:12px;min-height:20px}
+@media (prefers-color-scheme:dark){.err{color:#f08a80}}
+
+/* ── 结果区头部 ── */
+.panel{overflow:hidden}
+.panelhead{display:flex;align-items:center;justify-content:space-between;gap:12px;
+  flex-wrap:wrap;padding:14px 20px 0;border-bottom:1px solid var(--line);
+  background:var(--card)}
+
+/* ── 页签（官网 inner-tabs 风格：16px 文字 + 底部 3px 蓝线） ── */
+.tabs{display:inline-flex;background:transparent;border:0;
+  border-radius:0;padding:0;gap:32px;align-items:center}
+.tabs button{margin:0;padding:8px 0 12px;background:transparent;color:var(--sub);
+  border:0;border-radius:0;font-size:16px;line-height:24px;font-weight:400;cursor:pointer;
+  font-variant-numeric:tabular-nums;transition:color .16s,border-color .16s;
+  white-space:nowrap;position:relative;border-bottom:3px solid transparent}
+.tabs button:hover{color:var(--brand)}
+.tabs button.on{background:transparent;color:var(--brand-d);font-weight:700;
+  box-shadow:none;border:0;border-bottom:3px solid var(--brand);padding:8px 0 12px}
+.cnt{font-size:14px;color:inherit;opacity:.6;margin-left:6px;font-weight:400}
+
+/* ── 用户页面筛选（官网 tabs 同款；选中项蓝色下划线，曾科 10/22） ── */
+.filters{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:28px;row-gap:8px;
+  padding:14px 20px 16px;border-top:1px solid var(--line2)}
+.fbtn{margin:0;padding:0 0 6px;background:none;border:0;font-family:inherit;font-size:14px;
+  line-height:20px;font-weight:400;
+  color:var(--sub);cursor:pointer;white-space:nowrap;
+  border-bottom:2px solid transparent;border-radius:0;
+  transition:color .12s,border-color .12s}
+.fbtn:hover{color:var(--brand)}
+.fbtn.on{color:var(--brand-d);font-weight:700;border-bottom-color:var(--brand)}
+.fbtn .fcnt{font-size:12px;line-height:18px;opacity:.6;margin-left:5px;font-weight:400}
+/* 复制格式切换（2026-10-23 曾科）：总表隐藏列「占位/跳过」两种粘贴行为，
+   对应两种复制格式，粘不上就点另一个。放筛选行最右，小号、不抢视线。 */
+/* 一键复制整行（2026-10-23 曾科「靠你来确保」）：行尾 ⧉ 按钮，
+   点一下整行按当前复制格式进剪贴板，不再依赖手动框选。 */
+td.cp{text-align:center;padding:9px 4px}
+/* 自绘矩形选择的蓝色（曾科 10/23 13:07）：蓝色范围 = 实际复制范围 */
+tbody td.pick{background:rgba(59,130,246,.26) !important}
+thead th.pick{background:rgba(59,130,246,.16) !important}
+.cpbtn{cursor:pointer;color:var(--faint);font-size:15px;line-height:18px;
+  user-select:none;-webkit-user-select:none;display:inline-block;padding:0 4px}
+.cpbtn:hover{color:var(--brand)}
+.cpbtn.ok{color:var(--brand);font-weight:700}
+html.is-mobile .filters{padding:12px 16px 14px;column-gap:20px}
+html.is-mobile .pagehead{padding:14px 14px 0}
+html.is-mobile .pagehead h1{font-size:18px;line-height:26px}
+
+/* ── 表格（字号与官网表格一致：单元格 16px） ── */
+.tblbox{overflow:auto;-webkit-overflow-scrolling:touch}
+/* table-layout:fixed —— 让下面各列的 width 真正生效（默认 auto 只是"建议值"，
+   浏览器会按内容重新分配，导致两个页签列宽对不齐）。 */
+table{width:100%;border-collapse:separate;border-spacing:0;font-size:14px;line-height:22px;
+  table-layout:fixed;
+  -webkit-user-select:text;user-select:text}
+thead th{position:sticky;top:0;z-index:2;
+  background:#f4f7fc;color:var(--sub);font-weight:400;font-size:13px;line-height:18px;
+  padding:9px 12px;text-align:left;
+  border-bottom:1px solid var(--line);white-space:nowrap;
+  -webkit-user-select:none;user-select:none}
+thead th:first-child{border-top-left-radius:0}
+tbody td{padding:9px 12px;border-bottom:1px solid var(--line2);vertical-align:middle;
+  color:var(--ink2)}
+tbody tr:last-child td{border-bottom:0}
+tbody tr{transition:background .14s}
+tbody tr:hover{background:rgba(42,108,221,.04)}
+@media (prefers-color-scheme:dark){tbody tr:hover{background:rgba(95,149,232,.08)}}
+/* ── 列宽（曾科 10/22：新号码与重复号码列距必须一致，「员工」对应「重复表格」）──
+   用 <colgroup> 定义最稳：table-layout:fixed 下 col 的宽度优先级最高，
+   写在 th 上会被某些规则覆盖（实测被平均成 250.5px）。
+   colgroup 由 tbl() 按同一套档位生成：
+     手机号 170 / 时间 150 / 用户页面 auto(留白给最后) / 重复表格或员工 200
+   —— 两侧前三列宽度完全相同，切换页签不跳动。 */
+td.ph{font-variant-numeric:tabular-nums;font-weight:400;white-space:nowrap;
+  color:var(--ink);font-size:13px;line-height:18px;overflow:hidden;text-overflow:ellipsis}
+td.ym{color:var(--sub);white-space:nowrap;font-variant-numeric:tabular-nums;font-size:13px;line-height:18px;overflow:hidden;text-overflow:ellipsis}
+/* 用户页面（渠道名，如「手炒期货开户同花顺-ios」）：
+   ★ 2026-10-23 10:36 曾科要求「宽一点，尽量不转行」——
+     桌面端强制单行，宽度不够就先省略号，绝不折成两行（折行会让整行变高、看着乱）；
+     手机端卡片式布局允许自然换行，不受这条影响。 */
+td.pg{color:var(--brand);font-size:13px;line-height:18px;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis}
+@media (prefers-color-scheme:dark){td.pg{color:var(--brand)}}
+td.emp{color:var(--sub);white-space:nowrap;font-size:13px;line-height:18px}
+/* 客户姓名（2026-10-22 新增，取自内网预开户系统）：比手机号略轻、但仍是正文色。
+   空着就不显示任何占位（曾科 10/22：一排 "—" 太丑），整列安静留白。 */
+/* 客户姓名（2026-10-22，取自内网预开户系统）。
+   空着就不显示文字，但【单元格本身保留】——这样下面那条横向分割线不断档
+   （曾科 10/22：「客户姓名空着可以，但和其他项目一样的分割线还是要有，影响观感」）。 */
+td.nm{color:var(--ink);white-space:nowrap;font-size:14px;line-height:22px;font-weight:400;
+  overflow:hidden;text-overflow:ellipsis}
+/* 时段列（实/预）与备注列（2026-10-23 曾科）。徽章复用 .badge.new/.old 的配色：
+   「实」用暖色（old 配色）、「预」用冷色（new 配色），一眼可分。 */
+td.slot,td.memo{color:var(--sub);white-space:nowrap;font-size:13px;line-height:18px}
+td.slot{text-align:center}
+td.slot .badge{font-weight:400}
+/* ★ 2026-10-22 15:45：删掉 td.nm:empty::after{content:"\00a0"}。
+   以前用伪元素给空姓名塞一个 nbsp，结果复制时它被 innerText 当成第一格真实内容，
+   整行右移一格（手机号→时间列、时间→用户页面列），曾科反馈「粘贴后串列」。
+   现在空姓名就是真空白，复制时由脚本【按列位置】显式输出空串，绝不错位。 */
+.badge{display:inline-block;font-size:12px;line-height:18px;padding:2px 8px;border-radius:2px;
+  font-weight:400;white-space:nowrap}
+.badge.new{background:var(--new-bg);color:var(--new-fg)}
+.badge.old{background:var(--old-bg);color:var(--old-fg)}
+
+/* 斑马纹：仅窄屏改为卡片堆叠时取消 */
+.empty{padding:48px 20px;text-align:center;color:var(--sub);font-size:16px;line-height:24px}
+.empty .big{font-size:28px;opacity:.28;margin-bottom:10px}
+/* 空记录：表头照常显示，下面这一行「当前没有记录」占住版面（曾科 10/22） */
+.emptyrow td{padding:0 !important;border-bottom:1px solid var(--line2)}
 .hide{display:none}
-</style></head><body><div class="wrap">
+
+/* ── 页脚 ── */
+/* ★ 10/22 16:25 曾科：原来的卡片框+图标显得不专业，改成一条安静的灰色说明文字，
+   与更新提示同一段视觉（两行合一，不再有边框盒子）。 */
+.foot{max-width:1100px;margin:0 auto;padding:0 18px 30px;text-align:center;
+  font-size:13px;color:var(--faint);line-height:22px}
+.foot .ln{display:block}
+html.is-mobile .foot{padding:0 14px 26px;font-size:12px;line-height:20px}
+
+/* ── 手机布局：窄屏 或 识别为移动浏览器（html.is-mobile 由脚本打标） ── */
+@media (max-width:720px){
+  .top{padding:0 16px}
+  .topin{height:auto;min-height:56px;padding:10px 0}
+  .brand{font-size:18px;line-height:26px}
+  .meta{font-size:12px;line-height:18px;gap:8px}
+  .wrap{margin:16px auto 34px;padding:0 12px}
+  #lockCard{margin-top:4vh;padding:26px 22px 22px}
+  .panelhead{padding:12px 16px 0;gap:10px}
+  .tabs{width:100%;gap:26px}
+  .tabs button{flex:0 0 auto;padding:8px 0 10px;font-size:16px}
+  .tabs button.on{padding:8px 0 10px}
+}
+
+html.is-mobile .top{padding:0 16px}
+html.is-mobile .topin{height:auto;min-height:56px;padding:10px 0}
+html.is-mobile .brand{font-size:18px;line-height:26px}
+html.is-mobile .meta{font-size:12px;line-height:18px;gap:8px}
+html.is-mobile .wrap{margin:16px auto 34px;padding:0 12px}
+html.is-mobile #lockCard{margin-top:4vh}
+html.is-mobile .panelhead{padding:12px 16px 0;gap:10px}
+html.is-mobile .tabs{width:100%;gap:26px}
+html.is-mobile .tabs button{flex:0 0 auto;padding:8px 0 10px;font-size:16px}
+html.is-mobile .tabs button.on{padding:8px 0 10px}
+html.is-mobile .foot{font-size:12px;line-height:18px}
+
+/* 卡片化（窄屏与移动浏览器共用）——手机端字号重新排一遍，不做等比缩小 */
+html.is-mobile .tblbox table,html.is-mobile .tblbox thead,html.is-mobile .tblbox tbody,
+html.is-mobile .tblbox tr,html.is-mobile .tblbox td{display:block;width:100%}
+html.is-mobile .tblbox thead{display:none}
+html.is-mobile .tblbox tbody{padding:12px;display:flex;flex-direction:column;gap:10px}
+html.is-mobile .tblbox tr{background:var(--card);border:1px solid var(--line);border-radius:8px;
+  padding:13px 14px;position:relative}
+html.is-mobile .tblbox td{border:0;padding:0;font-size:14px;line-height:22px}
+html.is-mobile .tblbox td.ph{font-size:17px;line-height:26px;font-weight:700;margin-bottom:4px;
+  font-variant-numeric:tabular-nums}
+/* 新号码卡片：客户姓名当标题行（有资料才显示，空的不占位），手机号降为次行
+   （2026-10-23 曾科：姓名不加粗，与桌面端一致） */
+html.is-mobile .tblbox td.nm{font-size:16px;line-height:24px;font-weight:400;margin-bottom:2px}
+/* 时段/备注：手机卡片上并成一行小字，不占太多高度 */
+html.is-mobile .tblbox td.slot,html.is-mobile .tblbox td.memo{
+  display:inline-block;font-size:12px;line-height:20px;color:var(--faint);margin-right:10px}
+html.is-mobile .tblbox td.memo:empty,html.is-mobile .tblbox td.slot:empty{display:none}
+/* 手机上姓名空着时整格不占位（桌面端要保留单元格撑分割线，手机上卡片不需要） */
+html.is-mobile .tblbox td.nm:empty{display:none}
+html.is-mobile .tblbox[data-mode="ws1"] td.ph{font-size:16px;line-height:24px;font-weight:400;
+  color:var(--ink2);margin-bottom:0}
+html.is-mobile .tblbox td.ym{font-size:13px;line-height:20px;color:var(--faint);padding-bottom:6px}
+html.is-mobile .tblbox td.pg{font-size:14px;line-height:22px}
+html.is-mobile .tblbox td.emp{font-size:13px;line-height:20px;color:var(--sub);margin-top:6px}
+html.is-mobile .tblbox tr:hover{background:var(--card)}
+</style></head><body>
+
+<header class="top"><div class="topin">
+  <div class="brandbox">
+    <div class="logo">号</div>
+    <div class="brand">号码清单</div>
+  </div>
+  <div class="meta" id="meta"></div>
+</div></header>
+
+<div class="wrap">
 
 <div class="card" id="lockCard">
-  <h1>号码清单</h1>
-  <div class="sub">数据已加密，请输入口令查看</div>
-  <label>口令</label>
+  <div class="ico">
+    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="4" y="10.5" width="16" height="10.5" rx="2.4"/>
+      <path d="M8 10.5V7.4a4 4 0 0 1 8 0v3.1"/>
+    </svg>
+  </div>
+  <h1>数据已加密</h1>
+  <div class="sub">请输入口令解锁查看号码清单</div>
+  <label for="pwd">口令</label>
   <input id="pwd" type="password" inputmode="text" autocomplete="current-password" placeholder="请输入口令">
   <button id="go">解 锁</button>
   <div class="err" id="err"></div>
 </div>
 
+<!-- 需要重登时弹出的账号密码卡（曾科 10/22） -->
+<div class="mask hide" id="reloginMask">
+  <div class="dlg">
+    <h3 id="rlTitle">需要重新登录</h3>
+    <p class="desc" id="rlDesc"></p>
+    <div class="fld">
+      <label>账号</label>
+      <div class="row">
+        <input id="rlUser" readonly>
+        <button class="cp" data-for="rlUser">复制</button>
+      </div>
+    </div>
+    <div class="fld" id="rlPwdFld">
+      <label>密码</label>
+      <div class="row">
+        <input id="rlPwd" readonly>
+        <button class="cp" data-for="rlPwd">复制</button>
+      </div>
+    </div>
+    <p class="tip" id="rlTip"></p>
+    <div class="acts">
+      <button id="rlGo" class="pri">打开登录页</button>
+      <button id="rlClose">关 闭</button>
+    </div>
+  </div>
+</div>
+
 <div id="main" class="hide">
-  <div class="card">
+  <div class="pagehead">
     <h1>号码清单</h1>
-    <div class="sub" id="meta"></div>
-    <div class="tabs">
-      <button id="t1" class="on">新号码 <span id="c1"></span></button>
-      <button id="t2">重复号码 <span id="c2"></span></button>
+    <div class="today" id="today"></div>
+  </div>
+  <div class="card panel">
+    <div class="panelhead">
+      <div class="tabs">
+        <button id="t1" class="on">新号码 <span class="cnt" id="c1"></span></button>
+        <button id="t2">重复号码 <span class="cnt" id="c2"></span></button>
+      </div>
+    </div>
+    <!-- 用户页面筛选（曾科 10/22）：全部 / 买断投承项目 / 项目补量（免费）/ 其他 -->
+    <div class="filters" id="filters">
+      <button class="fbtn on" data-f="all">全部 <span class="fcnt" id="fa"></span></button>
+      <button class="fbtn" data-f="buydown">买断投承项目 <span class="fcnt" id="fb"></span></button>
+      <button class="fbtn" data-f="topup">项目补量（免费） <span class="fcnt" id="ft"></span></button>
+      <button class="fbtn" data-f="other">其他 <span class="fcnt" id="fo"></span></button>
     </div>
     <div id="tb1"></div>
     <div id="tb2" class="hide"></div>
   </div>
 </div>
 
+</div>
+
+<div class="foot hide" id="foot"></div>
+
 <script>
-var PACK = {"v": 1, "iter": 200000, "salt": "ScNmTvoKO2S1Fgrv7WVk+Q==", "iv": "WMPe9X8ad2eUko3j", "ct": "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"};
+var PACK = {"v": 1, "iter": 200000, "salt": "MNWwNwHrk1yHVaudcTPPVg==", "iv": "LkCugEPuFqW+01co", "ct": "7iFBMsUhYFgsKy7Bsfxq95EjhdxDsUTOnNzS453GkgR08j0pg7hMcRyvej2+qp9REhf49IETn4YoGIel2u68INGTIKWkFn1UHydqKSdgP0DIfWy7bYBsfx1dYsd13kCqLbXeiLgVWoObEXlaogbj6Exo+4qlmCz0e4AujIxowPFxKO9MDilCFgi2hcEVXooheKn3lqmYi8UDKQ1vaKgLr9LPja0ITxBowa7//1BbicYQmw=="};
+var PAGE_VER = 'v20261029b';   // ★ 前端逻辑改动时必须 bump；packTick 发现线上版本更新会自动整页刷新
+</script>
+<script>
 function b64(s){var b=atob(s),u=new Uint8Array(b.length);for(var i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u;}
-function go(){
-  var pwd=document.getElementById('pwd').value;
-  var err=document.getElementById('err'); err.textContent='解密中…';
-  crypto.subtle.importKey('raw',new TextEncoder().encode(pwd),'PBKDF2',false,['deriveBits'])
+// 解密一个数据包（go 与自动更新共用）
+function decryptPack(pk,pwd){
+  return crypto.subtle.importKey('raw',new TextEncoder().encode(pwd),'PBKDF2',false,['deriveBits'])
   .then(function(k){return crypto.subtle.deriveBits(
-      {name:'PBKDF2',salt:b64(PACK.salt),iterations:PACK.iter,hash:'SHA-256'},k,256);})
+      {name:'PBKDF2',salt:b64(pk.salt),iterations:pk.iter,hash:'SHA-256'},k,256);})
   .then(function(bits){return crypto.subtle.importKey('raw',bits,'AES-GCM',false,['decrypt']);})
   .then(function(key){return crypto.subtle.decrypt(
-      {name:'AES-GCM',iv:b64(PACK.iv)},key,b64(PACK.ct));})
-  .then(function(pt){render(JSON.parse(new TextDecoder().decode(pt)));})
-  .catch(function(e){err.textContent='口令不对，或数据已损坏';});
+      {name:'AES-GCM',iv:b64(pk.iv)},key,b64(pk.ct));})
+  .then(function(pt){return JSON.parse(new TextDecoder().decode(pt));});
+}
+function go(){
+  var pwd=document.getElementById('pwd').value;
+  var err=document.getElementById('err'), btn=document.getElementById('go');
+  if(!pwd){err.textContent='请输入口令';return;}
+  err.textContent='解密中…';btn.disabled=true;
+  decryptPack(PACK,pwd)
+  .then(function(obj){
+    try{sessionStorage.setItem('jh_pwd',pwd);}catch(e){}
+    MY_PRINT=packPrint(obj);   // ★ 解锁成功才算得出指纹，之后轮询才知道「变没变」
+    render(obj);})
+  .catch(function(e){err.textContent='口令不对，或数据已损坏';})
+  .then(function(){btn.disabled=false;});
 }
 document.getElementById('go').onclick=go;
 document.getElementById('pwd').addEventListener('keydown',function(e){if(e.key==='Enter')go();});
 
-function esc(s){return String(s==null?'':s).replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];});}
-function tbl(rows){
-  var h='<table><thead><tr><th>手机号码</th><th>时间</th><th>用户页面</th><th>员工</th></tr></thead><tbody>';
-  rows.forEach(function(r){
-    h+='<tr><td class="ph">'+esc(r[0])+'</td><td>'+esc(r[1])+'</td><td>'+esc(r[2])+
-       '</td><td>'+(r.length>4 ? esc(r[3])+' '+esc(r[4]) : esc(r[3]))+'</td></tr>';
-  });
-  return h+'</tbody></table>';
+// 自动更新（曾科 10/22）
+//   · 没新号码 → 屏幕完全不动（不闪、不重绘、不重输口令）
+//   · 有新号码 → 就地重绘表格，只在真拉到号的时刻才动
+//
+// ★ 判据必须用「数据内容指纹」，绝不能用密文比对。
+//   AES-GCM 每次加密都用新的随机 iv，密文每轮都不一样 ——
+//   拿密文比会出现「号没变但页面每 45 秒重绘一次」的假刷新（曾科 10/22 抓到的）。
+//   指纹 = updated 时刻 + 号码条数，这三个都变才说明真来了新号。
+function packPrint(o){
+  return (o.updated||'')+'|'+((o.ws1&&o.ws1.length)||0)+'|'+((o.ws2&&o.ws2.length)||0);
 }
+var CUR_PACK = JSON.stringify(PACK);
+var MY_PRINT = '';      // ★ 必须等解密成功后才有值；外层 PACK 只有加密参数，没有 updated/ws1
+function packTick(){
+  if(!MY_PRINT) return;   // 还没解锁过，不轮询（避免拿到空指纹乱比）
+  fetch(location.pathname+'?cb='+Date.now(),{cache:'no-store'})
+  .then(function(r){return r.text();})
+  .then(function(t){
+    // ★ 自愈：线上 PAGE_VER 比本页新 = 本页 JS 是旧版，整页刷新换新代码。
+    //   11 分钟最多刷一次（GitHub Pages 文档缓存 max-age=600，刷太早拿到的还是旧页，会空转）。
+    var vm=t.match(/var\s+PAGE_VER\s*=\s*'([^']+)'/);
+    if(vm && vm[1]!==PAGE_VER){
+      var lr=0; try{lr=+localStorage.getItem('pv_reload')||0;}catch(e){}
+      if(Date.now()-lr>11*60*1000){
+        try{localStorage.setItem('pv_reload',String(Date.now()));}catch(e){}
+        location.reload();
+      }
+      return;
+    }
+    var m=t.match(/var PACK = (\{[\s\S]*?\});/);
+    if(!m || !m[1] || m[1]===CUR_PACK) return;   // 页面文件本身没换，安静退出
+    var np; try{np=JSON.parse(m[1]);}catch(e){return;}
+    var pw=null; try{pw=sessionStorage.getItem('jh_pwd');}catch(e){}
+    if(!pw) return;
+    decryptPack(np,pw).then(function(obj){
+      CUR_PACK=m[1];
+      var pr=packPrint(obj);
+      if(pr!==MY_PRINT){
+        MY_PRINT=pr;
+        render(obj);          // 号码真变了：整页重绘 + 闪动提示
+        flashUpdate();
+      } else if(CURDATA && obj.beat && obj.beat!==CURDATA.beat){
+        // ★ 曾科 10/28 19:35：「不管有没有新号，拉了号码就更新时间」——
+        //   没新号也要把顶部「更新于」刷成本轮 beat。
+        //   只动状态栏（renderMeta），表格不重绘、不闪、不重输口令。
+        CURDATA.beat=obj.beat;
+        CURDATA.fasExp=obj.fasExp; CURDATA.fasDead=obj.fasDead; CURDATA.fasExpTs=obj.fasExpTs;
+        CURDATA.kxOk=obj.kxOk;
+        renderMeta();
+      }
+    }).catch(function(){});
+  }).catch(function(e){});
+}
+setInterval(packTick,45000);
+
+// ★ 手机切后台再切回来（曾科 10/22）：后台时浏览器会暂停 JS 定时器，
+//   不处理的话切回来看到的一直是旧数据。监听可见性变化，回来立即查一次。
+//   只在「可见且隐藏超过 30 秒」时触发，避免短暂切换时多余请求。
+var HIDDEN_AT=0;
+document.addEventListener('visibilitychange',function(){
+  if(document.hidden){ HIDDEN_AT=Date.now(); return; }
+  if(HIDDEN_AT && Date.now()-HIDDEN_AT>30000){ HIDDEN_AT=0; packTick(); }
+});
+
+// 顶部时间条闪一下，让人知道「刚更新过」
+function flashUpdate(){
+  var el=document.getElementById('meta'); if(!el) return;
+  el.classList.add('flash');
+  setTimeout(function(){el.classList.remove('flash');},1600);
+}
+(function(){var sp=null;try{sp=sessionStorage.getItem('jh_pwd');}catch(e){}
+  if(sp){document.getElementById('pwd').value=sp;go();}})();
+
+function esc(s){return String(s==null?'':s).replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];});}
+
+// ── 复制规则（曾科 10/22 定，15:50 重构）──
+// 新号码：复制 客户姓名/手机号/时间/用户页面/预录入步骤/员工 六列，列位置固定；
+// 重复号码：只复制前三列（手机号/时间/用户页面），「重复表格」与「员工」列不可复制。
+// ★ 核心：按【列号 colIdx】逐格取值，空单元格输出空串，绝不靠“剔除空 cell 后拼接”
+//   ——那样只要某格为空（典型：客户姓名为空），后面所有列就会整体左移一格，
+//   粘到表格里就是手机号跑到时间列、时间跑到用户页面列（曾科 10/22 反馈的串列）。
+function cellText(td){
+  if(!td) return '';
+  // 用 textContent 而不是 innerText：innerText 会把 CSS 伪元素（曾经给空姓名塞的 nbsp）
+  // 也算进来，textContent 只取真实文本节点，天然干净。
+  return String(td.textContent||'').replace(/[\s\u00a0]+/g,' ').trim();
+}
+
+// ── 总表列位映射：13 格 = A~M（曾科 2026-10-24 11:10 定）───────────────
+//   A客户姓名 | B实/预 | C空 | D电话 | E登记时间 | F用户页面
+//   G~J 空 | K预录入步骤 | L空 | M跟进员工
+//   网页表格的 td 顺序是：0姓名 1实/预 2备注(空) 3手机 4时间 5页面 6步骤 7员工 8⧉
+//   所以映射成：td0→A、td1→B、td2→C(恒空)、td3→D、td4→E、td5→F、td6→K、td7→M。
+//   ★ 只框了一部分列时，没框到的位置一律留空字符串 —— 粘到 A 列仍然逐列对齐，
+//     不会因为"少框一列"就整行左移（这个坑踩过三次）。
+var CP_COLS=13;
+function pick13(tds, colA, colB){
+  function g(i){
+    if(i<colA||i>colB||!tds[i]) return '';
+    if(tds[i].getAttribute('data-nocopy')) return '';
+    return cellText(tds[i]);
+  }
+  return [
+    g(0), g(1), '', g(3), g(4), g(5),      // A B C D E F
+    '', '', '', '',                        // G H I J
+    g(6), '',                              // K 步骤、L 空
+    g(7)                                   // M 员工
+  ];
+}
+// text/html 版本：粘贴到 Excel 时带上格式（曾科 2026-10-24 11:30 要求）：
+//   · 字体 微软雅黑 / 字号 10
+//   · 自动带线框（细实线）
+//   · B 列（预/实）、K 列（预录入步骤）、M 列（员工）居中，其余左对齐
+//     （曾科 10/24 11:30「预/实也居中」、11:31「预录步骤粘贴到 K 列时也居中」）
+// ⚠️ 入参必须是「行数组」并逐行生成 <tr>：曾科 10/24 11:24「我选了一片只粘贴了一行」，
+//    就是因为初版只塞了第一行，而 Excel 优先用 HTML 格式粘贴 → 多行只剩一行。
+//    HTML 的行数必须与 text/plain 严格一致，改这里务必回归多行场景。
+// ★ 字体写法（曾科 10/24 12:42「字体是宋体 不是我说的微软雅黑」）：
+//   Excel / WPS 解析剪贴板 HTML 时，`font-family:'Microsoft YaHei'`（英文名带引号）
+//   认不出来会直接回退到默认宋体。必须用 Excel 自己导出的那套写法：
+//   英文名 + mso-* 系列（mso-fareast 管中文），再叠一层 <font face> 兜底。
+var CP_FONT = 'font-family:"Microsoft YaHei";' +
+              'mso-ascii-font-family:"Microsoft YaHei";' +
+              'mso-fareast-font-family:"微软雅黑";' +
+              'mso-hansi-font-family:"Microsoft YaHei";' +
+              'mso-bidi-font-family:"Microsoft YaHei";' +
+              'font-size:10.0pt;';
+function CPhStyle(i){
+  // i=1 → B 实/预；i=10 → K 预录入步骤；i=12 → M 跟进员工
+  return 'border:0.5pt solid #000000;padding:0px 2px;' + CP_FONT +
+         'text-align:' + ((i === 1 || i === 10 || i === 12) ? 'center' : 'left') + ';';
+}
+function cpHtml(rows){
+  if(!rows || !rows.length) return '';
+  if(!rows[0] || !rows[0].length) rows=[rows];      // 兼容误传单行数组
+  // ★ 属性一律用单引号包：CP_FONT 里字体名带双引号，用 style="..." 会把属性提前闭合
+  var s="<table border='0' cellspacing='0' cellpadding='0' style='border-collapse:collapse;"+CP_FONT+"'>";
+  for(var r=0;r<rows.length;r++){
+    s+='<tr>';
+    for(var i=0;i<rows[r].length;i++){
+      var v=String(rows[r][i]==null?'':rows[r][i]);
+      s+="<td style='"+CPhStyle(i)+"'><font face=\"微软雅黑\">"+esc(v)+"</font></td>";
+    }
+    s+='</tr>';
+  }
+  return s+'</table>';
+}
+
+// ── 自绘矩形选择（曾科 10/23 13:07）────────────────────────────────
+// 需求原话：「反正就不要前面的，后面的可以由我选」。
+// 浏览器跨行拖选的高亮是"流式"的：按住手机号列往下拖，中间行会被一路点亮到行尾，
+// 看着像把时间/用户页面也选了，跟真正复制的内容对不上。所以改成自己画蓝色：
+//   · 起点列 = 按下鼠标的那一列，左边的列永远不高亮、也不复制；
+//   · 右边的列由鼠标拖到哪算哪；
+//   · 蓝色 = 实际复制范围，所见即所得。
+// 拖选时压掉原生选区，Ctrl+C 由下面的 copy 处理器按矩形拼数据。
+var PICK={on:false,active:false,box:null,trs:[],r0:0,r1:0,c0:0,c1:0,x0:0,y0:0};
+
+function pickUnpaint(){
+  if(!PICK.box) return;
+  Array.prototype.forEach.call(PICK.box.querySelectorAll('td.pick'),function(td){
+    td.classList.remove('pick');
+  });
+}
+function pickReset(){
+  pickUnpaint();
+  PICK.on=false; PICK.active=false; PICK.box=null; PICK.trs=[];
+  document.documentElement.style.userSelect='';
+}
+function pickPaint(){
+  if(!PICK.box||!PICK.trs.length) return;
+  pickUnpaint();
+  var lo=Math.min(PICK.r0,PICK.r1), hi=Math.max(PICK.r0,PICK.r1);
+  var colA=PICK.c0, colB=Math.max(PICK.c0,PICK.c1);
+  for(var i=lo;i<=hi;i++){
+    var tds=PICK.trs[i]?PICK.trs[i].querySelectorAll('td'):null;
+    if(!tds) continue;
+    for(var c=colA;c<=colB&&c<tds.length;c++){
+      if(tds[c].getAttribute('data-nocopy')) continue;
+      tds[c].classList.add('pick');
+    }
+  }
+}
+document.addEventListener('mousedown',function(e){
+  if(e.button!==0) return;                       // 右键不参与
+  var td=e.target&&e.target.closest?e.target.closest('.tblbox tbody td'):null;
+  if(!td||td.getAttribute('data-nocopy')){ pickReset(); return; }
+  var box=td.closest('.tblbox');
+  var trs=Array.prototype.slice.call(box.querySelectorAll('tbody tr'))
+    .filter(function(tr){return !tr.classList.contains('emptyrow');});
+  var ri=trs.indexOf(td.parentNode);
+  if(ri<0){ pickReset(); return; }
+  pickUnpaint();
+  PICK.on=true; PICK.active=false; PICK.box=box; PICK.trs=trs;
+  PICK.r0=PICK.r1=ri; PICK.c0=PICK.c1=td.cellIndex;
+  PICK.x0=e.clientX; PICK.y0=e.clientY;
+},true);
+document.addEventListener('mousemove',function(e){
+  if(!PICK.on) return;
+  if(!PICK.active){
+    if(Math.abs(e.clientX-PICK.x0)<4&&Math.abs(e.clientY-PICK.y0)<4) return;
+    PICK.active=true;
+    document.documentElement.style.userSelect='none';   // 停掉原生选择扩展
+  }
+  var s=window.getSelection();
+  if(s&&s.rangeCount) s.removeAllRanges();             // 压掉流量式高亮
+  var el=document.elementFromPoint(e.clientX,e.clientY);
+  var td=el&&el.closest?el.closest('.tblbox tbody td'):null;
+  if(td&&PICK.box.contains(td)&&!td.getAttribute('data-nocopy')){
+    var ri=PICK.trs.indexOf(td.parentNode);
+    if(ri>=0){ PICK.r1=ri; PICK.c1=td.cellIndex; }
+  }
+  pickPaint();
+  e.preventDefault();
+},true);
+document.addEventListener('mouseup',function(){
+  if(!PICK.on) return;
+  PICK.on=false;
+  document.documentElement.style.userSelect='';
+  if(!PICK.active) pickUnpaint();               // 只是单击：不留蓝色
+},true);
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape') pickReset();
+});
+
+document.addEventListener('copy',function(e){
+  // ★ 自绘矩形选择优先：蓝色画到哪，就复制到哪（曾科 10/23 13:07）
+  if(PICK.active && PICK.box && PICK.trs.length && document.contains(PICK.box)){
+    var trs=PICK.trs;
+    var lo=Math.min(PICK.r0,PICK.r1), hi=Math.max(PICK.r0,PICK.r1);
+    var colA=PICK.c0, colB=Math.max(PICK.c0,PICK.c1);
+    var md=PICK.box.getAttribute('data-mode')||'ws1';
+    // ★ 2026-10-24 11:04 曾科：「预录步骤和员工姓名也是要的」——取消拖过第 5 列就截住的上限。
+    // ★★ 同日 11:10 定稿：**只要框到了「预录入步骤 / 员工」列，就按总表 A~M 的 13 格输出**
+    //   （没框到的列留空），粘到 A 列一次落位。只框前面几列时仍按原样连续输出。
+    var res=[], allRows=[];
+    for(var i=lo;i<=hi;i++){
+      var tds=trs[i].querySelectorAll('td'), cs=[];
+      if(md==='ws1' && Math.min(colB, tds.length-1)>=6){
+        cs=pick13(tds, colA, colB);
+      }else{
+        for(var c=colA;c<=colB&&c<tds.length;c++){
+          // ★★ 2026-10-23 19:37 曾科「还是不行」根治：预留空列**必须占位输出**。
+          //   原来这里是 `if(md==='ws1'&&c===2) continue;`（剔掉空列），想法是
+          //   "粘到总表时 Excel 会跳过隐藏列" —— 这是错的：Excel 粘贴照样写入隐藏列，
+          //   剔掉它 = 后面全部左移一格（时间落进电话列、页面落进登记时间列）。
+          if(md==='ws1'&&c===2){ cs.push(''); continue; }
+          if(tds[c].classList.contains('cp')) continue;   // 行尾 ⧉ 按钮列不参与
+          cs.push(tds[c].getAttribute('data-nocopy')?'':cellText(tds[c]));
+        }
+      }
+      // ⚠️ 不能裁掉行尾空列：多行格数必须一致，否则粘到表格会错位
+      //   （某行员工为空、下一行有值，裁了就少一格）。
+      if(cs.length){ res.push(cs.join('\t')); allRows.push(cs); }
+    }
+    e.preventDefault();
+    e.clipboardData.setData('text/plain',res.join('\n'));
+    if(allRows.length) e.clipboardData.setData('text/html',cpHtml(allRows));
+    return;
+  }
+  var sel=window.getSelection();
+  if(!sel||!sel.rangeCount) return;
+  var r=sel.getRangeAt(0);
+  var box=r.commonAncestorContainer;
+  if(box.nodeType===3) box=box.parentNode;
+  var host=box.closest?box.closest('.tblbox'):null;
+  if(!host) return;
+  var mode=host.getAttribute('data-mode')||'ws1';
+  // 可复制列数：新号码 8 列（姓名/预/空/手机/时间/页面/**预录步骤/员工**，行尾 ⧉ 不算）；
+  //   重复号码 3 列（后面两列内部标记不复制）。
+  //   ★ 10/24 11:04 曾科：框到「预录步骤/员工」也要带上，所以上限从 6 放到 8。
+  var OUTN=(mode==='ws2')?3:8;
+
+  // ── ① 从【真实 DOM】的 Range 算出选区横跨哪些列 ──────────────────────
+  //   ★ 曾科 10/22 16:35：多选时按实际选中的列输出，客户姓名可单独成列。
+  //   ⚠️ 不能拿 cloneContents 的 td 数量判断：Range 落在单元格内部时，
+  //      浏览器会把整行所有 td 都补进 clone（实测只选第 0 列仍返回 6 个 td），
+  //      据此判断会永远“选中全部列”。必须回到原表格里按 cellIndex 算。
+  function cellOf(node){
+    while(node && node!==host){
+      if(node.nodeType===1 && (node.tagName==='TD'||node.tagName==='TH')) return node;
+      node=node.parentNode;
+    }
+    return null;
+  }
+  var cA=cellOf(r.startContainer), cB=cellOf(r.endContainer);
+  // Range 端点落在 <tr> 上（浏览器拖选跨单元格时常见）→ 用该行首/末格
+  function rowFallback(node,useLast){
+    while(node && node!==host){
+      if(node.nodeType===1 && node.tagName==='TR'){
+        var tds=node.querySelectorAll('td');
+        return useLast?tds[tds.length-1]:(tds[0]||null);
+      }
+      node=node.parentNode;
+    }
+    return null;
+  }
+  if(!cA) cA=rowFallback(r.startContainer,false);
+  if(!cB) cB=rowFallback(r.endContainer,true);
+
+  // ── ② 选区覆盖到哪些数据行（按原表格的 tbody 行序）──────────────────
+  var allTrs=Array.prototype.slice.call(host.querySelectorAll('tbody tr'))
+    .filter(function(tr){return !tr.classList.contains('emptyrow');});
+  var iA=allTrs.indexOf(cA?cA.parentNode:null);
+  var iB=allTrs.indexOf(cB?cB.parentNode:null);
+  if(iA<0) iA=0;
+  if(iB<0) iB=allTrs.length-1;
+  if(iB<iA){var tmp=iA;iA=iB;iB=tmp;}
+  var rowsPicked=allTrs.slice(iA,iB+1);
+
+  // ── ③ 列区间 ─────────────────────────────────────────────────────
+  //   都取到有效单元格 → 用 [lo,hi]；取不到（选区在表头/空白）→ 全部可复制列。
+  var lo,hi;
+  if(cA&&cB){
+    lo=Math.min(cA.cellIndex,cB.cellIndex);
+    hi=Math.max(cA.cellIndex,cB.cellIndex);
+  }else{
+    lo=0; hi=OUTN-1;
+  }
+  lo=Math.max(0,Math.min(lo,OUTN-1));
+  hi=Math.max(lo,Math.min(hi,OUTN-1));
+
+  // ★ 2026-10-23 12:49 曾科：严格矩形选区 —— 跨行往下选时，列区间就是
+  //   「起点列 → 终点列」之间的列，不自动扩到后面的列：
+  //   从手机号列往下拖（终点停在手机号列）= 每行只出手机号；
+  //   从手机号拖到「用户页面」= 每行 [手机号,时间,用户页面]；
+  //   从时间列往下拖 = 每行只出时间，绝不往前跑到手机号列。
+  //   （新号码表的预留空列仍然始终剔除。）
+
+  var out=[], allRows=[];
+  rowsPicked.forEach(function(tr){
+    var tds=tr.querySelectorAll('td');
+    if(!tds.length) return;
+    var cells=[];
+    if(mode==='ws1' && hi>=6){
+      // ★ 10/24 11:10：框到「预录入步骤/员工」→ 按总表 A~M 的 13 格输出，粘 A 列一次落位
+      cells=pick13(tds, lo, hi);
+    }else{
+      for(var i=lo;i<=hi;i++){
+        // ★★ 2026-10-23 19:37 与上面自绘选区同步：预留空列**占位输出，不再剔除**。
+        //   旧注释「粘贴端跳过隐藏列后正好逐列对齐」是错的——Excel 不会跳过隐藏列，
+        //   剔掉空列就整体左移一格（曾科 19:30 那行 B=预 / D=时间 / E=页面 就是这么来的）。
+        if(mode==='ws1' && i===2){ cells.push(''); continue; }
+        var td=tds[i];
+        // 不可复制列（重复表格/员工）即使落在区间内也输出空
+        cells.push(td && !td.hasAttribute('data-nocopy') ? cellText(td) : '');
+      }
+    }
+    // ★ 2026-10-23 19:37：**不再裁掉行尾空列**。
+    //   原来多列时会把行尾连续空格 pop 掉，结果「页面为空的行」比「页面有值的行」少一格，
+    //   多行一起粘到 Excel 就错位（曾科 19:30 那行页面有值、下一行没有，正好差一格）。
+    //   格数必须只由「选中的列区间」决定，跟数据有没有值无关。
+    if(cells.length===0) return;              // 整行空行跳过（如「当前没有记录」占位）
+    allRows.push(cells);
+    out.push(cells.join('\t'));
+  });
+
+  if(!out.length){
+    // 兜底：选区不在任何数据行内（如只框了表头或某格里的文字），给纯文本
+    var txt=(sel.toString()||'').replace(/[\s\u00a0]+/g,' ').trim();
+    var inNocopy=box.closest?box.closest('td[data-nocopy],th[data-nocopy]'):null;
+    if(!txt||inNocopy) return;
+    out.push(txt);
+  }
+  e.preventDefault();
+  e.clipboardData.setData('text/plain',out.join('\n'));
+  if(allRows.length) e.clipboardData.setData('text/html',cpHtml(allRows));
+});
+document.addEventListener('mousedown',function(e){
+  var c=e.target.closest?e.target.closest('td[data-nocopy]'):null;
+  if(c){var s=window.getSelection();if(s)s.removeAllRanges();}
+});
+
+// ── 起点列锁定（曾科 10/23 13:00）─────────────────────────────────
+//   「从手机号码开始选就锁定，让他选不到前面的列」：按下鼠标的那一列 = 起点列，
+//   松开鼠标时如果选区往前（终点列 < 起点列），就把选区修正回「起点列」这一列，
+//   复制永远从起点列开始。往右拖照常扩展（手机号→用户页面）。
+var _anchorCell=null;
+document.addEventListener('mousedown',function(e){
+  var td=e.target&&e.target.closest?e.target.closest('td'):null;
+  _anchorCell=(td && !td.hasAttribute('data-nocopy') && td.closest('.tblbox'))?td:null;
+});
+document.addEventListener('mouseup',function(){
+  if(!_anchorCell) return;
+  var s=window.getSelection();
+  var _done=function(){ _anchorCell=null; };
+  if(!s||s.isCollapsed||!s.rangeCount) return _done();
+  var r=s.getRangeAt(0);
+  var box=_anchorCell.closest('.tblbox');
+  if(!box||!box.contains(r.startContainer)||!box.contains(r.endContainer)) return _done();
+  var cellOf=function(n){ while(n&&n.nodeName!=='TD') n=n.parentNode; return n; };
+  var tdA=cellOf(r.startContainer), tdB=cellOf(r.endContainer);
+  if(!tdA||!tdB) return _done();
+  var trs=Array.prototype.slice.call(box.querySelectorAll('tbody tr'))
+    .filter(function(tr){return !tr.classList.contains('emptyrow');});
+  var rowA=trs.indexOf(_anchorCell.parentNode);
+  var endTd=(tdA.parentNode===_anchorCell.parentNode)?tdB:tdA;   // 另一端=非锚行那端
+  var rowB=trs.indexOf(endTd.parentNode);
+  if(rowA<0||rowB<0) return _done();
+  var colA=_anchorCell.cellIndex;
+  var colB=Math.max(endTd.cellIndex,colA);                       // 终点列不早于起点列
+  var i0=Math.min(rowA,rowB), i1=Math.max(rowA,rowB);
+  var curLo=Math.min(tdA.cellIndex,tdB.cellIndex);
+  var tds0=trs[i0].querySelectorAll('td'), tds1=trs[i1].querySelectorAll('td');
+  var s0=tds0[Math.min(colA,tds0.length-1)];
+  var s1=tds1[Math.min(colB,tds1.length-1)];
+  if(!s0||!s1) return _done();
+  // 只在选区确实越界（往前了）时才重设，避免干扰正常拖选
+  if(curLo<colA){
+    var nr=document.createRange();
+    nr.setStart(s0,0);
+    nr.setEnd(s1,s1.childNodes.length);
+    s.removeAllRanges(); s.addRange(nr);
+  }
+  _done();
+});
+
+// ── 复制格式：固定「跳过隐藏列」（曾科 10/23 11:51：开关撤掉）────
+//   从「时段」框到「用户页面」＝ 4 格 [实,手机号,时间,用户页面]，粘总表状态列；
+//   从「手机号」框到「用户页面」＝ 3 格，粘总表电话列。中间不再留占位空格。
+
+// ── 复制内容回显：曾科 2026-10-23 20:46「这个没必要提示」——已整块撤掉 ──
+//   提醒自己：这个提示是排错时临时加的辅助，别再加回来。
+
+// ── 一键复制整行（曾科 10/23「靠你来确保」）───────────────────
+// 点行尾 ⧉ → 按【当前复制格式】把整行放进剪贴板：
+//   pad  = 实/预 + 空 + 手机号 + 时间 + 用户页面（5 格，粘到状态列 B，隐藏列占位）
+//   skip = 实/预 + 手机号 + 时间 + 用户页面（4 格，隐藏列被跳过时用）
+// 内容由代码拼装，不靠用户框选，从源头消除「框选没框到空白列」这种错位。
+document.addEventListener('click', function(e){
+  var b=e.target&&e.target.closest?e.target.closest('.cpbtn'):null;
+  if(!b) return;
+  var tr=b.closest?b.closest('tr'):null;
+  if(!tr) return;
+  var tds=tr.querySelectorAll('td');
+  // ★ 2026-10-23 19:26 起：优先用渲染时算好的 data-cp（唯一真源，与 DOM 列数无关）。
+  var cells=null;
+  var raw=tr.getAttribute('data-cp');
+  if(raw){
+    try{ cells=JSON.parse(decodeURIComponent(raw)); }catch(err){ cells=null; }
+  }
+  if(!cells){
+    if(tds.length<6) return;
+    cells = pick13(tds, 0, 7);       // 兜底也走 A~M 13 格
+  }
+  var txt=cells.join('\t');
+  var dhtml=cpHtml([cells]);
+  var done=function(){
+    var old=b.textContent;
+    b.textContent='✓'; b.classList.add('ok');
+    setTimeout(function(){ b.textContent=old; b.classList.remove('ok'); },1200);
+  };
+  var legacy=function(){
+    var ta=document.createElement('textarea'); ta.value=txt;
+    ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.select();
+    try{ document.execCommand('copy'); }catch(e){}
+    document.body.removeChild(ta); done();
+  };
+  // ★ 10/24：同时写 text/html，Excel 才会按样式落格（M 列员工居中）。
+  if(navigator.clipboard&&navigator.clipboard.write&&window.ClipboardItem){
+    try{
+      navigator.clipboard.write([new ClipboardItem({
+        'text/plain': new Blob([txt], {type:'text/plain'}),
+        'text/html':  new Blob([dhtml], {type:'text/html'})
+      })]).then(done, legacy);
+      return;
+    }catch(err){}
+  }
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt).then(done, legacy);
+  }else{
+    legacy();
+  }
+});
+
+function tbl(rows,mode,f){
+  // 用户页面所在下标：重复号码是 r[2]，新号码（10/22 加姓名列后）是 r[3]
+  var PGI=(mode==='ws2')?2:5;
+  if(f && f!=='all') rows=rows.filter(function(r){return fKey(r[PGI])===f;});
+  // 表头（两种模式各自一套，空记录时也要照常显示 —— 曾科 10/22）
+  var cols,heads;
+  if(mode==='ws2'){
+    // ★ 2026-08-22 18:17 曾科：表头右侧多一块空白。原因：colgroup 多写了一个空 <col>，
+    //   fixed 布局下它把剩余宽度全吸走，表格右端多出一列"无表头无内容"的空白。
+    //   修法：col 数与列数一致（6 个），「用户页面」列用 auto 吸收余宽，表格铺满卡片。
+    cols='<col style="width:124px"><col style="width:150px"><col>'+
+         '<col style="width:200px"><col style="width:200px">';
+    heads='<th>手机号码</th><th>时间</th><th>用户页面</th><th>重复表格</th><th>员工</th>';
+  }else{
+    // ★ 2026-10-23 曾科：客户姓名后加两列 ——
+    //   「时段」（交易日 08:40–17:45 登记=实，其他=预，服务端算好）+ 一列【预留空白列】
+    //   （方便他自己复制粘贴用，所以表头也留空，不写「备注」字样）。
+    //   数据顺序：[姓名, 时段, 预留, 手机号, 时间, 页面, 步骤, 员工]（8 列）。
+    //   ★ 2026-10-23 12:13 曾科：「用户页面还是不够宽」—— 把其余列压到最小够用。
+    //   ★ 2026-10-23 17:13 曾科：「现在又变得用户页面太宽、预录入步骤太短」——
+    //     上一版让「用户页面」用 auto 吃掉全部余宽（页面容器上限 1100px，页列被拉到 500px），
+    //     而「预录入步骤」固定 108px 显得又挤又短。
+    //     改成两列都给固定宽度：页面 320px（最长渠道名「手炒开户-行情（付费）同花顺-安卓」
+    //     约 254px，留足余量不折行，超长还有 title 悬停看全文）、步骤 150px（够放「预录入步骤」
+    //     五个字表头与「视频验证/完善资料」等步骤名）。
+    //     九个列宽合计 1034px ≤ 卡片内宽(1100-36=1064)，余下约 30px 落到行尾 ⧉ 列，不再撑页面列。
+    //   ★ 2026-10-24 11:10 曾科：「预录入步骤可以再往[右]做一点，空的有点多」——
+    //     步骤列 150→210，员工列收到 96（只放「罗芬」这种两字名足够），页面列 320→300。
+    //     合计 1054px ≤ 卡片内宽(1100-36=1064)。
+    cols='<col style="width:92px"><col style="width:46px"><col style="width:16px">'+
+         '<col style="width:124px"><col style="width:142px">'+
+         '<col style="width:300px"><col style="width:210px"><col style="width:96px">'+
+         '<col style="width:28px">';
+    heads='<th>客户姓名</th><th>时段</th><th></th><th>手机号码</th><th>时间</th>'+
+          '<th>用户页面</th><th>预录入步骤</th><th>员工</th><th></th>';
+  }
+  var head='<div class="tblbox" data-mode="'+mode+'"><table data-mode="'+mode+'">'+
+           '<colgroup>'+cols+'</colgroup><thead><tr>'+heads+'</tr></thead><tbody>';
+  if(!rows.length){
+    // 空记录：表头照常，正文一行「当前没有记录」撑住版面
+    return head+'<tr class="emptyrow"><td colspan="9">'+
+           '<div class="empty"><div class="big">🗂️</div>当前没有记录</div></td></tr>'+
+           '</tbody></table></div>';
+  }
+  // 列宽 colgroup（曾科 10/22 14:50 定稿）：同名列左右对齐，中间留空。
+  //   ★ 10/22 15:20 加两列：新号码表 A=客户姓名 B=预录入步骤（内网预开户系统读取）。
+  //   空白统一留在最右侧，不再让某一列被拉宽。
+  var h=head;
+  rows.forEach(function(r){
+    var last;
+    if(mode==='ws2'){
+      var flag=String(r[3]||'').trim();
+      if(flag==='新'||flag==='新表') flag='新表';
+      else if(flag==='旧'||flag==='旧表') flag='旧表';
+      else if(flag) flag='新表';
+      var cls=(flag==='新表')?'new':'old';
+      // ★ 2026-10-23 13:12 曾科：「广分那里选不到」——重复号码表的「重复表格」「员工」
+      //   两列也放开可选中、可复制（原来打了 data-nocopy，选到也不输出内容）。
+      //   现在只有行尾的 ⧉ 按钮列还保留不可复制。
+      last=(flag?'<td class="emp"><span class="badge '+cls+'">'+esc(flag)+'</span></td>'
+                :'<td class="emp"></td>')+
+           '<td class="emp">'+esc(r[4]||'')+'</td>';
+    }else{
+      // 新号码数据顺序（2026-10-23 起 8 列）：
+      //   [客户姓名, 时段, 备注, 手机号, 时间, 用户页面, 预录入步骤, 跟进员工]
+      // 时段列「实/预」用小徽章样式；备注列暂留空。
+      var slot=String(r[1]||'').trim();
+      var slotTd=slot?'<td class="slot"><span class="badge '+(slot==='实'?'old':'new')+'">'
+                     +esc(slot)+'</span></td>'
+                   :'<td class="slot"></td>';
+      last='<td class="pg">'+esc(r[6]||'')+'</td><td class="emp">'+esc(r[7]||'')+'</td>'+
+           '<td class="cp" data-nocopy="1" style="user-select:none">'+
+           '<span class="cpbtn" title="一键复制">⧉</span></td>';
+    }
+    if(mode==='ws2'){
+      h+='<tr><td class="ph">'+esc(r[0])+'</td><td class="ym">'+esc(r[1])+
+         '</td><td class="pg" title="'+esc(r[2])+'">'+esc(r[2])+'</td>'+last+'</tr>';
+    }else{
+      // ★★ 2026-10-24 11:10 曾科定稿：复制内容不是 5 格，而是**固定 13 格 = 总表 A~M 列**：
+      //   A姓名 | B实/预 | C空 | D电话 | E时间 | F用户页面 | G~J空 | K预录入步骤 | L空 | M员工
+      //   这样粘到总表 A1 起一次落位，不用记"从哪列开始粘"。
+      var _cp=[
+        String(r[0]||'').trim(),   // A 客户姓名
+        slot,                      // B 实/预
+        '',                        // C 空
+        String(r[3]||''),          // D 电话
+        String(r[4]||''),          // E 登记时间
+        String(r[5]||''),          // F 用户页面
+        '', '', '', '',            // G H I J 空
+        String(r[6]||''),          // K 预录入步骤
+        '',                        // L 空
+        String(r[7]||'')           // M 跟进员工（粘贴后要求居中，见 cpHtml）
+      ];
+      var cpAttr=' data-cp="'+esc(encodeURIComponent(JSON.stringify(_cp)))+'"';
+      h+='<tr'+cpAttr+'><td class="nm">'+esc(r[0])+'</td>'+slotTd+
+         '<td class="memo">'+esc(r[2]||'')+'</td><td class="ph">'+esc(r[3])+
+         '</td><td class="ym">'+esc(r[4])+'</td><td class="pg" title="'+esc(r[5])+'">'+esc(r[5])+'</td>'+last+'</tr>';
+    }
+  });
+  return h+'</tbody></table></div>';
+}
+// ── 重登弹窗（曾科 10/22）：绿点不弹，红点点开给账号密码，一键复制 ──
+var RELOGIN={
+  fas:{
+    title:'同花顺期商平台需要重新登录',
+    desc:'登录已到期，请点下面「打开期商平台」手动登录一次（邮箱收 6 位验证码）。',
+    user:'zengke@gf.com.cn',
+    pwd:'',
+    tip:'账号是收验证码的邮箱；恢复后这一项会自动变绿点。'
+  },
+  kx:{
+    title:'预开户系统需要重新登录',
+    desc:'登录态失效、自动重登也没成功，请点下面「打开登录页」手动登录一次（账号密码在下方，可一键复制）。',
+    user:'广分',
+    pwd:'GFQH@gf2026',
+    tip:'登录地址：10.38.28.36:8098 的预开户管理后台；登录成功后会自动恢复。'
+  }
+};
+// ★ 曾科 2026-10-24 14:17：「你给个按钮我点登录是否好点？」——
+//   弹窗里直接给「打开登录页」，点一下新标签打开后台，省得自己敲/找地址。
+var RL_URL={
+  kx:'http://10.38.28.36:8098/pre/manage/#/aos/audit/business/customer-status',
+  fas:'https://fas.0033.com/'
+};
+function openRelogin(kind){
+  var c=RELOGIN[kind]; if(!c) return;
+  var go=document.getElementById('rlGo');
+  if(go){
+    go.textContent = (kind==='kx') ? '打开登录页' : '打开期商平台';
+    go.onclick=function(){ window.open(RL_URL[kind]||'','_blank'); };
+  }
+  document.getElementById('rlTitle').textContent=c.title;
+  document.getElementById('rlDesc').textContent=c.desc;
+  document.getElementById('rlUser').value=c.user;
+  document.getElementById('rlTip').textContent=c.tip||'';
+  // 没有密码（期商平台走邮件验证码）就把整块「密码」藏掉，别留半截空标签
+  document.getElementById('rlPwdFld').style.display=c.pwd?'':'none';
+  if(c.pwd) document.getElementById('rlPwd').value=c.pwd;
+  document.getElementById('reloginMask').classList.remove('hide');
+}
+function closeRelogin(){ document.getElementById('reloginMask').classList.add('hide'); }
+document.getElementById('rlClose').onclick=closeRelogin;
+document.getElementById('reloginMask').onclick=function(e){
+  if(e.target===this) closeRelogin();
+};
+Array.prototype.forEach.call(document.querySelectorAll('#reloginMask .cp'),function(b){
+  b.onclick=function(){
+    var inp=document.getElementById(b.getAttribute('data-for'));
+    inp.removeAttribute('readonly');
+    inp.select();
+    var ok=false;
+    try{ ok=document.execCommand('copy'); }catch(e){}
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(inp.value).then(function(){},function(){});
+      ok=true;
+    }
+    inp.setAttribute('readonly','readonly');
+    var old=b.textContent;
+    b.textContent=ok?'已复制':'请长按复制';
+    setTimeout(function(){ b.textContent=old; },1400);
+  };
+});
+
+// ── 顶部状态栏（独立成函数：页面长期开着也不怕，60 秒后自动重算）──────
+//   ★ 2026-10-24 13:43 曾科：「到期之后显红灯，并且文字变为期商平台登录已到期」。
+//     同步任务停摆时页面不会重建，只靠 build 时算死的 fasDead 会一直挂绿点，
+//     所以这里用 fasExpTs（到期时间戳）+ 本机时间**实时**判断，过期立刻转红。
+function renderMeta(){
+  var d=CURDATA; if(!d||!document.getElementById('meta')) return;
+  var t=d.beat||d.updated||'';
+  var fasExp=d.fasExp||'';
+  var fasExpTs=Number(d.fasExpTs)||0;
+  var fasDead=d.fasDead!==false;   // 缺字段按已过期处理（宁可提示也别装没事）
+  if(fasExpTs>0) fasDead=(Date.now()/1000)>fasExpTs;
+  var fasTxt = !fasExp ? '期商平台登录态读取失败'
+             : fasDead ? '期商平台登录已到期'
+             : '期商平台登录到期 '+fasExp;
+  // 预开户系统：token 可用就是绿点；真失效（自动重登也兜不住）才红点。
+  var kxOk = d.kxOk !== false;
+  var kxTxt = kxOk ? '预开户系统正常' : '预开户系统需手动登录';
+  var w1=(d.ws1||[]).length, w2=(d.ws2||[]).length;
+
+  var html='<span class="dotlive"></span>更新于 '+esc(t)+
+           '<span class="sep">|</span>新号码 '+w1+' 条'+
+           '<span class="sep">|</span>'+
+           '<span class="st '+(fasDead?'bad':'ok')+'" data-st="fas">'+
+             '<i class="d"></i><span class="txt">'+esc(fasTxt)+'</span></span>'+
+           '<span class="sep">|</span>'+
+           '<span class="st '+(kxOk?'ok':'bad')+'" data-st="kx">'+
+             '<i class="d"></i><span class="txt">'+esc(kxTxt)+'</span></span>';
+  document.getElementById('meta').innerHTML=html;
+  Array.prototype.forEach.call(document.querySelectorAll('#meta .st.bad'),function(el){
+    el.onclick=function(){ openRelogin(el.getAttribute('data-st')); };
+  });
+}
+setInterval(function(){ try{ renderMeta(); }catch(e){} }, 60000);
+
 function render(d){
   document.getElementById('lockCard').classList.add('hide');
   document.getElementById('main').classList.remove('hide');
-  document.getElementById('meta').textContent='更新于 '+d.updated+' ｜ 共 '+(d.ws1.length+d.ws2.length)+' 条';
+  CURDATA=d;
+  // ★ 2026-10-23 19:19 曾科定稿：「检测了就算，保留这个就行」——
+  //   顶部时间 = d.beat（每一轮同步都会刷新 ＝ 最近一次校验时刻），
+  //   **不看数据有没有变化**。原来用 d.updated（号码真变了才动），
+  //   一晚上没新号就会一直停在旧时间，看着像同步挂了。
+  //   ⚠️ 别再改回 d.updated，也别在后面追加「数据自 X 起无变化」之类附加说明。
+  renderMeta();
   document.getElementById('c1').textContent='('+d.ws1.length+')';
   document.getElementById('c2').textContent='('+d.ws2.length+')';
-  document.getElementById('tb1').innerHTML=tbl(d.ws1);
-  // 重复号码表不标「已在总表」：能进重复表本身就是总表命中筛出来的，再标是废话（曾科 10/22）
-  document.getElementById('tb2').innerHTML=tbl(d.ws2);
   document.getElementById('t1').onclick=function(){show(1);};
   document.getElementById('t2').onclick=function(){show(2);};
+  (function(){var w='日一二三四五六';var n=new Date();
+    document.getElementById('today').textContent=
+      n.getFullYear()+'年'+(n.getMonth()+1)+'月'+n.getDate()+'日 星期'+w[n.getDay()];})();
+  document.getElementById('foot').innerHTML=
+    '<span class="ln">复制号码：用鼠标选中号码（变浅蓝色）后按 Ctrl+C 即可复制。注意是浅蓝色，不是深蓝色。</span>'+
+    '<span class="ln">号码数据约每 5 分钟更新一次。如长时间未见刷新，请手动刷新页面。</span>'+
+    '<span class="ln">本页只显示最近 24 小时内新增的号码，超出 24 小时的请人工登录期商平台查询。</span>';
+  document.getElementById('foot').classList.remove('hide');
+  paint();
 }
+
+// ── 用户页面筛选（曾科 10/22）──
+// 全称取自 fas 系统：买断投承项目 / 项目补量（免费）；其余一律归「其他」。
+// 筛选对当前页签生效，切换页签时各自重算，计数也跟着变。
+var CURDATA=null, CURTAB=1, CURF='all';
+var F_BUY='买断投承项目', F_TOP='项目补量（免费）';
+function fKey(name){
+  var s=String(name==null?'':name).trim();
+  if(s===F_BUY) return 'buydown';
+  if(s===F_TOP) return 'topup';
+  return 'other';
+}
+function rowsOf(d,tab){
+  if(!d) return [];
+  return tab===1 ? (d.ws1||[]) : (d.ws2||[]);
+}
+// 用户页面下标跟着页签走（2026-10-23 新号码加「时段/备注」两列后，页面从 3 挪到 5）
+function pageOf(r,tab){
+  return String((tab===1 ? r[5] : r[2]) || '');
+}
+function paint(){
+  var d=CURDATA; if(!d) return;
+  var all=rowsOf(d,CURTAB);
+  // 计数（基于当前页签的全量，不受筛选影响）
+  var n={'all':all.length,'buydown':0,'topup':0,'other':0};
+  all.forEach(function(r){ n[fKey(pageOf(r,CURTAB))]++; });
+  document.getElementById('fa').textContent=n.all;
+  document.getElementById('fb').textContent=n.buydown;
+  document.getElementById('ft').textContent=n.topup;
+  document.getElementById('fo').textContent=n.other;
+  var shown = CURF==='all' ? all : all.filter(function(r){return fKey(pageOf(r,CURTAB))===CURF;});
+  document.getElementById('tb1').innerHTML=tbl(rowsOf(d,1),'ws1',CURF);
+  document.getElementById('tb2').innerHTML=tbl(rowsOf(d,2),'ws2',CURF);
+  document.getElementById('tb1').classList.toggle('hide',CURTAB!==1);
+  document.getElementById('tb2').classList.toggle('hide',CURTAB!==2);
+  Array.prototype.forEach.call(document.querySelectorAll('#filters .fbtn'),function(b){
+    b.classList.toggle('on', b.getAttribute('data-f')===CURF);
+  });
+}
+Array.prototype.forEach.call(document.querySelectorAll('#filters .fbtn'),function(b){
+  b.onclick=function(){ CURF=b.getAttribute('data-f'); paint(); };
+});
+
 function show(i){
+  CURTAB=i;
   document.getElementById('tb1').classList.toggle('hide',i!==1);
   document.getElementById('tb2').classList.toggle('hide',i!==2);
   document.getElementById('t1').classList.toggle('on',i===1);
   document.getElementById('t2').classList.toggle('on',i===2);
+  paint();
 }
 </script>
-</div></body></html>
+</body></html>
