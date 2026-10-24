@@ -417,7 +417,7 @@ html.is-mobile .tblbox tr:hover{background:var(--card)}
 <div class="foot hide" id="foot"></div>
 
 <script>
-var PACK = {"v": 1, "iter": 200000, "salt": "3oOEpniUdPavIWxPNNEe5g==", "iv": "wF96xMMs/L7G7YXI", "ct": "kod/M6dWhRkf+to8suOjrdjf8zPVeyG0/jduYlPPNzX7EiWH8NgkF1V+hhNRWp6BgJjQFwnzZ3HwfP81qUfVI3kMJqbugnGpeMYLocGmDyrnTJYiFt0dRIuuqFUSPmEr0Yr3nr9iRfu7Ox9T2nocj4i+qQPuBaSYfogUHwJlvhGiZJR13dSBNC/ohnv88h0ePZ4yatN4+25h9qw4aSTD96oemQ5pA28Hr5653USQuE/YO9DWMObOSuy0XJA+uuDrpqYGD5zTXb13lCCSPXjCEocbhBYVhGgAOB2SnHtyPzuUBKLpc4E6L8EHU2LFjRVbWlOfePL8GyxajooIGkTD2fruVCqDq+djlk/c1ltQFI2FCWUPFF61O+ZqNh9mBLU46AKsepI/LQXPwJAZ1CLweo7G5stneR6Owr7GgLhayi53DwSnEsI7/MxsH2qMT4QYhLi7MffuHzDkQsumCsRAOdbtslxDvMHIcginNxrDyarO1A0sH6wsaVYMH48xQVxEKtmwChfm9HyEPLZU0cavcCCkCQ=="};
+var PACK = {"v": 1, "iter": 200000, "salt": "140ch6WVdmhPcUnKT53gzg==", "iv": "g6yTfZMsO/7qXglU", "ct": "L57Y98iSCN5IdN+f22N8m19202Al75zk8t0m/8vIfvuVSqOx+oog+ynCvI0Z+ewUe/TK9Mu2TtyhfM4onM8k4pqt9iwr2KRSiBzNSlgJFUiVNcPA+02Dcg0+VLfEjMpmLYtqIfZLRqI4jHn77mKL6F8kZ/+hX7sk7LEJPtbiYJE/32N/GB5bSVe8cOL1uUJXgKvGVvVwC2r0VBROi0UYcecxxFbx2RF5cfHW7fuvlUC8GZP3outc0Y24qeA4reJDi6CPaKtohpaz95GsH+Y9ZEcsREqm1g7SXN+pAgqbw9QS/QOM7Qz/IZcO1HfD+cWTPN6KxaeF4xU0kPOyQRVyVFoU9OwmocBNtBOWvihikaHkrJPfeiOTs+booQoFVGQDXmm6yQ+GisbT6wiCCzVYu3xQ5fQIZVwtx2nO9UmiwkXoNfgN2qvXtPeVxkCyfQOuzcMqKDrkMZ3nWY5J6LIuyncUiiugy5+PbA0VuLLQfY8SHygBDJT+BvW6JVGOPkTwLqIVgYgmBxmKj7ITqk/+goyIFLoE7OKe1yldwkUIXM8PDaTofyjiCsDE"};
 </script>
 <script>
 function b64(s){var b=atob(s),u=new Uint8Array(b.length);for(var i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u;}
@@ -1054,6 +1054,40 @@ Array.prototype.forEach.call(document.querySelectorAll('#reloginMask .cp'),funct
   };
 });
 
+// ── 顶部状态栏（独立成函数：页面长期开着也不怕，60 秒后自动重算）──────
+//   ★ 2026-10-24 13:43 曾科：「到期之后显红灯，并且文字变为期商平台登录已到期」。
+//     同步任务停摆时页面不会重建，只靠 build 时算死的 fasDead 会一直挂绿点，
+//     所以这里用 fasExpTs（到期时间戳）+ 本机时间**实时**判断，过期立刻转红。
+function renderMeta(){
+  var d=CURDATA; if(!d||!document.getElementById('meta')) return;
+  var t=d.beat||d.updated||'';
+  var fasExp=d.fasExp||'';
+  var fasExpTs=Number(d.fasExpTs)||0;
+  var fasDead=d.fasDead!==false;   // 缺字段按已过期处理（宁可提示也别装没事）
+  if(fasExpTs>0) fasDead=(Date.now()/1000)>fasExpTs;
+  var fasTxt = !fasExp ? '期商平台登录态读取失败'
+             : fasDead ? '期商平台登录已到期'
+             : '期商平台登录到期 '+fasExp;
+  // 预开户系统：token 可用就是绿点；真失效（自动重登也兜不住）才红点。
+  var kxOk = d.kxOk !== false;
+  var kxTxt = kxOk ? '预开户系统正常' : '预开户系统需要重登';
+  var w1=(d.ws1||[]).length, w2=(d.ws2||[]).length;
+
+  var html='<span class="dotlive"></span>更新于 '+esc(t)+
+           '<span class="sep">|</span>新号码 '+w1+' 条'+
+           '<span class="sep">|</span>'+
+           '<span class="st '+(fasDead?'bad':'ok')+'" data-st="fas">'+
+             '<i class="d"></i><span class="txt">'+esc(fasTxt)+'</span></span>'+
+           '<span class="sep">|</span>'+
+           '<span class="st '+(kxOk?'ok':'bad')+'" data-st="kx">'+
+             '<i class="d"></i><span class="txt">'+esc(kxTxt)+'</span></span>';
+  document.getElementById('meta').innerHTML=html;
+  Array.prototype.forEach.call(document.querySelectorAll('#meta .st.bad'),function(el){
+    el.onclick=function(){ openRelogin(el.getAttribute('data-st')); };
+  });
+}
+setInterval(function(){ try{ renderMeta(); }catch(e){} }, 60000);
+
 function render(d){
   document.getElementById('lockCard').classList.add('hide');
   document.getElementById('main').classList.remove('hide');
@@ -1063,33 +1097,7 @@ function render(d){
   //   **不看数据有没有变化**。原来用 d.updated（号码真变了才动），
   //   一晚上没新号就会一直停在旧时间，看着像同步挂了。
   //   ⚠️ 别再改回 d.updated，也别在后面追加「数据自 X 起无变化」之类附加说明。
-  var t=d.beat||d.updated||'';
-  // ── 期商平台登录态（曾科 2026-10-22 15:58 定稿）──────────────────
-  //   只显示到期时间；过期了红点显示「已于 X 过期」。是否过期由服务端按秒算好
-  //   传过来（d.fasDead），前端不解析日期字符串（上次就栽在这）。
-  //   重登后（验证码发我）会话文件立刻变新，下一轮刷新即恢复绿点。
-  var fasExp=d.fasExp||'';
-  var fasDead=d.fasDead!==false;   // 缺字段按已过期处理（宁可提示也别装没事）
-  var fasBad=fasDead;
-  var fasTxt = !fasExp ? '期商平台登录态读取失败'
-             : fasDead ? '期商平台登录已于 '+fasExp+' 过期'
-             : '期商平台登录到期 '+fasExp;
-  // 预开户系统：token 可用就是绿点；真失效（自动重登也兜不住）才红点。
-  var kxOk = d.kxOk !== false;
-  var kxTxt = kxOk ? '预开户系统正常' : '预开户系统需要重登';
-
-  var html='<span class="dotlive"></span>更新于 '+esc(t)+
-           '<span class="sep">|</span>新号码 '+d.ws1.length+' 条'+
-           '<span class="sep">|</span>'+
-           '<span class="st '+(fasBad?'bad':'ok')+'" data-st="fas">'+
-             '<i class="d"></i><span class="txt">'+esc(fasTxt)+'</span></span>'+
-           '<span class="sep">|</span>'+
-           '<span class="st '+(kxOk?'ok':'bad')+'" data-st="kx">'+
-             '<i class="d"></i><span class="txt">'+esc(kxTxt)+'</span></span>';
-  document.getElementById('meta').innerHTML=html;
-  Array.prototype.forEach.call(document.querySelectorAll('#meta .st.bad'),function(el){
-    el.onclick=function(){ openRelogin(el.getAttribute('data-st')); };
-  });
+  renderMeta();
   document.getElementById('c1').textContent='('+d.ws1.length+')';
   document.getElementById('c2').textContent='('+d.ws2.length+')';
   document.getElementById('t1').onclick=function(){show(1);};
