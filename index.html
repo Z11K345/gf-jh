@@ -417,7 +417,7 @@ html.is-mobile .tblbox tr:hover{background:var(--card)}
 <div class="foot hide" id="foot"></div>
 
 <script>
-var PACK = {"v": 1, "iter": 200000, "salt": "H1yioiVmt/fi705TqTgcLg==", "iv": "ITMC/sD2SKQ2kdUR", "ct": "KT7tSLy044JGKtRv5CU4SzdP5BjuVtbHZVrJmDU0w7brKcBkstRyqgFj8rMXpGYEbnHdWe25E8e6hwtzUmf+vunmMTRwlFwDZQkGjuy3mi+NnaDyllP3HLFkvnbEkOGY4HkEJUAl9wwsfhkV4m9vVUXuawAia/PYUPzQyTzwG1ccBLV2XHGSF1w9HBcj1uNOnR5CRLJ7rRwzQBZU4Fv9BUrSvuW8fL0T+XdddxF2NRBN9Cgne8XBYIJdF34vx2sdzraPxJMwz3Lu4YR5lrQbh11y6Mpw4GOxUXvoz26eGgvgdKEtMuKZ8nQ7QquO11LpV6zJhXcEGaMHdAkHyTJSW7IZGQAJlaf/0XdIECXYXz4EfBRvzgzGJd72dzuXiD4fqIMHaDq2rY8ZafOzh1S6rjxEcS1XRm6MT8ADfFLgrYDEze5vh7JuRrtKUKvrTiA2s5f4D+gYl0CvNf1junmMvX9hfPzKM2OQBQi4CquO4cd7THa8WLN+ZWS9iDbbagEj8hI3BV06kD/C61nYp6GpyA/BKMFcW8HokUZ6"};
+var PACK = {"v": 1, "iter": 200000, "salt": "jPewvW6bJRx0w2Ov+W7B8g==", "iv": "H3yJ1DZ9IyZiCX0g", "ct": "NRE12Z4Vz8vt2eInQ7qnEQfmZ6WMg2sOL+4EzS5WopWX+AtfUWi8osTS9ap1SWjpwm3k3xnkqKdqjgWdNI6tmnLJQ1Bb1ISXmTncibZneqjRzRwD30EJbP4vYrKPPMY7uxAV+t+CqD1ESZ2jz93EzJ6pJg+xO/FCyxexyGkTACJe8xbUZeckpxUgO/KhwhcCGELtO2mFdDCUAMImdDbXCC7v94RkDED4VtoyzWMnxj2/PFcqcD2g8DNym6wbMaY8CmSULuJi16ZFPgDYLz8+siGdkWK8IS3tEORfUebe"};
 </script>
 <script>
 function b64(s){var b=atob(s),u=new Uint8Array(b.length);for(var i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u;}
@@ -543,7 +543,16 @@ function pick13(tds, colA, colB){
 // ⚠️ 入参必须是「行数组」并逐行生成 <tr>：曾科 10/24 11:24「我选了一片只粘贴了一行」，
 //    就是因为初版只塞了第一行，而 Excel 优先用 HTML 格式粘贴 → 多行只剩一行。
 //    HTML 的行数必须与 text/plain 严格一致，改这里务必回归多行场景。
-var CP_FONT = "font-family:'Microsoft YaHei','微软雅黑',sans-serif;font-size:10pt;";
+// ★ 字体写法（曾科 10/24 12:42「字体是宋体 不是我说的微软雅黑」）：
+//   Excel / WPS 解析剪贴板 HTML 时，`font-family:'Microsoft YaHei'`（英文名带引号）
+//   认不出来会直接回退到默认宋体。必须用 Excel 自己导出的那套写法：
+//   英文名 + mso-* 系列（mso-fareast 管中文），再叠一层 <font face> 兜底。
+var CP_FONT = 'font-family:"Microsoft YaHei";' +
+              'mso-ascii-font-family:"Microsoft YaHei";' +
+              'mso-fareast-font-family:"微软雅黑";' +
+              'mso-hansi-font-family:"Microsoft YaHei";' +
+              'mso-bidi-font-family:"Microsoft YaHei";' +
+              'font-size:10.0pt;';
 function CPhStyle(i){
   // i=1 → B 实/预；i=10 → K 预录入步骤；i=12 → M 跟进员工
   return 'border:0.5pt solid #000000;padding:0px 2px;' + CP_FONT +
@@ -552,12 +561,13 @@ function CPhStyle(i){
 function cpHtml(rows){
   if(!rows || !rows.length) return '';
   if(!rows[0] || !rows[0].length) rows=[rows];      // 兼容误传单行数组
-  var s='<table border="0" cellspacing="0" cellpadding="0" style="border-collapse:collapse;'+CP_FONT+'">';
+  // ★ 属性一律用单引号包：CP_FONT 里字体名带双引号，用 style="..." 会把属性提前闭合
+  var s="<table border='0' cellspacing='0' cellpadding='0' style='border-collapse:collapse;"+CP_FONT+"'>";
   for(var r=0;r<rows.length;r++){
     s+='<tr>';
     for(var i=0;i<rows[r].length;i++){
       var v=String(rows[r][i]==null?'':rows[r][i]);
-      s+='<td style="'+CPhStyle(i)+'">'+esc(v)+'</td>';
+      s+="<td style='"+CPhStyle(i)+"'><font face=\"微软雅黑\">"+esc(v)+"</font></td>";
     }
     s+='</tr>';
   }
