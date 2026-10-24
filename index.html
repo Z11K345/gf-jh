@@ -418,7 +418,7 @@ html.is-mobile .tblbox tr:hover{background:var(--card)}
 <div class="foot hide" id="foot"></div>
 
 <script>
-var PACK = {"v": 1, "iter": 200000, "salt": "AIat/RcXBbOOLemy712j1w==", "iv": "ClwHmv4oBYcBADW9", "ct": "5JZ1HYGAkzxbt7u4gV+FwuTxH4cuJzFvRM3RMJ0npcVgnCYRMjGYGzHrwPM4RPyaX//bYAVcFebGZQC1QgHiLF7BvxKc9P3qnjWfHK896MRLU+KUdHXyEnnBfAgLC/rdmdTRdb5q4HdMhaUs51rfHVLiHqeJN21rLv9+wBs91po/9hOCzeTWfC6SNhqPYPhMS3MqCQu1kbOItG2U16vNQHXcMtFEMazQN6w/TOufgGS08gRQg2tiEyvYqc0mq9ClOhpEy5kdS4i5oosDKV3lxZ6BFSl9aJsDeg3EBL/JLuPOHLRgTRt42rO/gQm0mm/H9w6u26LhukV8kA6Yz/8RrxAiiuChjg6L0PrrNSwIjzqE8pjoc4I8EpHeBNiYGXwATvWXlOUlvkwKYcvYwhGYvKfmmsasf8QNWwXwJsuMOa4B3utTJ70Wt41F8vaVXgadHnF/cB64JP1lH2Qfg8QRl0hAdWa/aCiNp21V97nzd/dISA5jc9SX/kQ/XkIrbyqY63pJfBxlJ1xtAAyR2QG0aT4+bfvLG9OEoYijmpRMVN28/nyso53pFiSofHL/drdk39S94xgzd4V+cX6wUes/BHDAXC5JG2cob6PqwA=="};
+var PACK = {"v": 1, "iter": 200000, "salt": "jsC2N0QktZAXktXzUtpBBQ==", "iv": "RKHMFzJFfROMZXwE", "ct": "dvbkfqZ+yJMFIsjOrt7mN4ZR19lTPFy1mx3MzsMGml+6vzPy011nAA/4w3o8gqvgoUJH28C3KFCXLsTb8cmnZen5rEcnSkpsDqnkafGdhzSF0Sop8kSr25WTZpTpzzIStB3JMY9JG4qglNZ8SZvkZwvIMvOq5Ycqlh6aCwjA27H+jxp+0jUhK3bznzQmt8J4idH4UwO7xXmhPW8g9Qcb71BZlRijYyqbBAMx1/M/MHhr1lI/aUk/zbbCxFvsssFGoZEezMj9TL/VDZB8vlk3OVyLzU0IkGXUU9uTzXG+J58TP1nU4lNdpG+Q51rOhMQStpH9qV4jkeZevXRIc/NKowq14nUU5fq4Z+EKhntomDk16qHWqoyjFkpS00awGoTxNf0aaAUHuDEjy8cd/1nqC5WBnJtHS9L1eUTOZbufmXtS2tQ8a7SR8v5SbL1gxsv+5jooA1F+edLq8pfoJ1jcLfn56gndD6MnPtpoy261tm6vRZLxgKf6a7bBwyueXA+zmrZTiYgREySnFiolsD3f+vq/XtM6SEXUd7zfry7SRyxOcDtu92NKTsPEW8NiA7NEsDU/V4+l1D/J7B82TdOmr92i1ipFmXrVhKaI8A=="};
 </script>
 <script>
 function b64(s){var b=atob(s),u=new Uint8Array(b.length);for(var i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u;}
@@ -1008,14 +1008,14 @@ function tbl(rows,mode,f){
 var RELOGIN={
   fas:{
     title:'同花顺期商平台需要重新登录',
-    desc:'收到邮件里的 6 位验证码后，把验证码发给曾科即可恢复。',
+    desc:'登录已到期，请点下面「打开期商平台」手动登录一次（邮箱收 6 位验证码）。',
     user:'zengke@gf.com.cn',
     pwd:'',
     tip:'账号是收验证码的邮箱；恢复后这一项会自动变绿点。'
   },
   kx:{
     title:'预开户系统需要重新登录',
-    desc:'系统登录态失效，自动重登也没成功，请用下面的账号手动登录一次。',
+    desc:'登录态失效、自动重登也没成功，请点下面「打开登录页」手动登录一次（账号密码在下方，可一键复制）。',
     user:'广分',
     pwd:'GFQH@gf2026',
     tip:'登录地址：10.38.28.36:8098 的预开户管理后台；登录成功后会自动恢复。'
@@ -1082,7 +1082,7 @@ function renderMeta(){
              : '期商平台登录到期 '+fasExp;
   // 预开户系统：token 可用就是绿点；真失效（自动重登也兜不住）才红点。
   var kxOk = d.kxOk !== false;
-  var kxTxt = kxOk ? '预开户系统正常' : '预开户系统需要重登';
+  var kxTxt = kxOk ? '预开户系统正常' : '预开户系统需手动登录';
   var w1=(d.ws1||[]).length, w2=(d.ws2||[]).length;
 
   var html='<span class="dotlive"></span>更新于 '+esc(t)+
