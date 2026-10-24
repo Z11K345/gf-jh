@@ -383,6 +383,7 @@ html.is-mobile .tblbox tr:hover{background:var(--card)}
     </div>
     <p class="tip" id="rlTip"></p>
     <div class="acts">
+      <button id="rlGo" class="pri">打开登录页</button>
       <button id="rlClose">关 闭</button>
     </div>
   </div>
@@ -417,7 +418,7 @@ html.is-mobile .tblbox tr:hover{background:var(--card)}
 <div class="foot hide" id="foot"></div>
 
 <script>
-var PACK = {"v": 1, "iter": 200000, "salt": "W51INgCcu8vTpsBzwtNb1w==", "iv": "zaErp//gGHEWjgoB", "ct": "2gQ9/FuBlab8LUZ+3oLV8YwW3f9tW1yJX0+Y+/MY9SqcewiEQTuLMODza6DZa8JVGOgQ5+CfzzXCbz879Sxo2AXXCr1hvrEpaph0ucd7HgeCtcg7csuj/00OcO3AkFaGvTD/h4UzoEx4yX1rkK+SdnfXG5X3aSuymrKfkHFUjQKjuii3z4SgBs9ZleCFYn0d5p+Xlc6hiPXCpUvOAyBLkwwoEZu0ZXCOl33WP5T+TJgpwP5wIuMRSa6jd4/UIBRhjl4k5wTjYzP8c7bgqEDatNjWpGG1A51YqzPmURuZE90go8bfT4UdyxMsNt8BCDFVMfjNg3k+T+nlUFXibuSB2IBFa4wKs50pMAfUCMraocvLHKrqA3bEjrGPeVqk/Shq0HovRQQrYjJsmdZs+xY1vGlz2xL+s4MFUyS9YmTmOkLWWJrKLjqZBLyTV3elr1llDtzkODUDK++WGLn3UtekzBWEvM7A3I38RxzhBWKEOb9YMqP05QDm+X0O1Q=="};
+var PACK = {"v": 1, "iter": 200000, "salt": "MLBAHvmiLQ1/nGAivxy6kA==", "iv": "lkojhwdsyVja78XO", "ct": "FfQWZnlUeUup0jkmfqGenjOMOJDPZwlerqvHeySsQK8Low08JZj7c9q4mCzHb4cca9Ye74zl0r5T8w9hiHSCacg49e4LNr95uwui/hrFyDBM4V8KPOy+Q1PwYu8JhehoTPHPODHgjWI/1RCTRzq5Z6DmVFcZ20ek0f4DbgsRj+Kv/Jrrw2nxt5EKd/jAR16oc4KWD7KEAWrRbBXFcCcfDivXoE+EysVU6tpXn9AOmAEg1Aqi1mUmOpNR7jVeNDe9j+oHoNYRq2wy9UlB/Vxa49/Dw1aVJQypcPmS/8Q+Cmeq0bHx+syVL7s9XVKrx3FZUMxqr9AdQhpWSKjPTWfCeKI2aBK8f1M7HdnorUDjPOMsBiitaoJCnjNL8otb5A6VuYRXhsuhmSIEYRfGfP3+VzHRgVkeRjjLaDnLzHGbO4LvZm27HipXD8Biv59D3KEK/TiFblc7pNgfFmfhp9eKjdtjROoR/PyEwnuVwuvNtGOQHsyv9rwFbiamqw=="};
 </script>
 <script>
 function b64(s){var b=atob(s),u=new Uint8Array(b.length);for(var i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u;}
@@ -1020,8 +1021,19 @@ var RELOGIN={
     tip:'登录地址：10.38.28.36:8098 的预开户管理后台；登录成功后会自动恢复。'
   }
 };
+// ★ 曾科 2026-10-24 14:17：「你给个按钮我点登录是否好点？」——
+//   弹窗里直接给「打开登录页」，点一下新标签打开后台，省得自己敲/找地址。
+var RL_URL={
+  kx:'http://10.38.28.36:8098/pre/manage/#/aos/audit/business/customer-status',
+  fas:'https://fas.0033.com/'
+};
 function openRelogin(kind){
   var c=RELOGIN[kind]; if(!c) return;
+  var go=document.getElementById('rlGo');
+  if(go){
+    go.textContent = (kind==='kx') ? '打开登录页' : '打开期商平台';
+    go.onclick=function(){ window.open(RL_URL[kind]||'','_blank'); };
+  }
   document.getElementById('rlTitle').textContent=c.title;
   document.getElementById('rlDesc').textContent=c.desc;
   document.getElementById('rlUser').value=c.user;
